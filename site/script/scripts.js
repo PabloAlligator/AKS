@@ -1,8 +1,9 @@
-// =========================
+
 // 1. Бургер-меню
-// =========================
+
 const burger = document.querySelector('.header__burger');
 const nav = document.querySelector('.header__nav');
+
 
 if (burger && nav) {
     burger.addEventListener('click', () => {
@@ -11,24 +12,38 @@ if (burger && nav) {
     });
 }
 
-// =========================
+
 // 2. Появление шапки при скролле
-// =========================
+
 const header = document.querySelector('.header');
 
+// Более чувствительная версия с таймаутом
 if (header) {
+    let lastScroll = 0;
+    let ticking = false;
+    
     window.addEventListener('scroll', () => {
-        if (window.scrollY > 50) {
-            header.classList.add('scrolled');
-        } else {
-            header.classList.remove('scrolled');
+        if (!ticking) {
+            requestAnimationFrame(() => {
+                const currentScroll = window.pageYOffset;
+                
+                if (currentScroll > lastScroll && currentScroll > 100) {
+                    header.classList.add('hidden');
+                } else if (currentScroll < lastScroll && currentScroll < lastScroll - 10) {
+                    header.classList.remove('hidden');
+                }
+                
+                lastScroll = currentScroll;
+                ticking = false;
+            });
+            ticking = true;
         }
     });
 }
 
-// =========================
+
 // 3. Плавный скролл к секциям
-// =========================
+
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('a[href^="#"]').forEach(link => {
         link.addEventListener('click', function (e) {
@@ -58,9 +73,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// =========================
+
 // 4. EmailJS
-// =========================
+
 emailjs.init('r0VmzggkXuhBsXCeb'); // твой Public Key
 
 const form = document.getElementById('connectForm');
@@ -69,9 +84,9 @@ const successMsg = document.getElementById('successMessage');
 const errorMsg = document.getElementById('errorMessage');
 const btnText = submitBtn?.querySelector('.btn-text');
 
-// =========================
+
 // 5. Нормализация телефона
-// =========================
+
 function normalizePhone(phone) {
     if (!phone) return '';
 
@@ -110,9 +125,9 @@ function formatPhoneForSend(phone) {
     return `+7 (${normalized.slice(1, 4)}) ${normalized.slice(4, 7)}-${normalized.slice(7, 9)}-${normalized.slice(9, 11)}`;
 }
 
-// =========================
+
 // 6. Маска ввода телефона
-// =========================
+
 const phoneInput = document.querySelector('input[name="phone"]');
 
 if (phoneInput) {
@@ -137,9 +152,9 @@ if (phoneInput) {
     });
 }
 
-// =========================
+
 // 7. Отправка формы
-// =========================
+
 if (form) {
     form.addEventListener('submit', function (e) {
         e.preventDefault();
@@ -250,9 +265,9 @@ if (form) {
     });
 }
 
-// =========================
+
 // 8. Сброс формы
-// =========================
+
 function resetForm() {
     if (!form) return;
 
