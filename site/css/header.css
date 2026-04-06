@@ -1,0 +1,200 @@
+html,
+body {
+  background: #000;
+  margin: 0;
+  padding: 0;
+  overflow-x: clip;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  padding: 20px 0;
+  transition: all 0.3s ease;
+}
+.header.scrolled {
+  padding: 15px 0;
+  backdrop-filter: blur(5px);
+}
+.header__logo {
+  margin-left: 40px;
+  z-index: 2000;
+}
+.header__logo img {
+  max-width: 150px;
+  height: auto;
+  display: block;
+}
+.header__burger {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  margin-right: 40px;
+  cursor: pointer;
+  z-index: 2000;
+}
+.header__burger span {
+  width: 30px;
+  height: 3px;
+  background: white;
+  transition: 0.4s;
+}
+.header__burger.active span:nth-child(1) {
+  transform: rotate(45deg) translate(6px, 6px);
+}
+.header__burger.active span:nth-child(2) {
+  opacity: 0;
+}
+.header__burger.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(6px, -6px);
+}
+.header__nav {
+  margin-right: 40px;
+}
+.header__nav ul {
+  display: flex;
+  gap: 25px;
+  align-items: center;
+}
+.header__nav ul li {
+  list-style: none;
+}
+.header__nav ul li a {
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.9098039216);
+  font-size: clamp(16px, 2vw, 20px);
+  font-family: russoone;
+  letter-spacing: 1px;
+  position: relative;
+  transition: 0.3s;
+}
+.header__nav ul li a::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: red;
+  transition: 0.4s;
+}
+.header__nav ul li a:hover::after {
+  width: 100%;
+}
+.header__nav ul li:last-child a {
+  padding: 10px 20px;
+  color: white;
+  background: rgba(255, 0, 0, 0.8);
+  border-radius: 8px;
+}
+.header__nav ul li:last-child a::after {
+  display: none;
+}
+.header__nav ul li:last-child a:hover {
+  color: black;
+}
+.header__nav ul li:last-child a:hover::before {
+  background: white;
+  transform: skew(-15deg) scale(1.05);
+}
+
+@media (max-width: 1024px) {
+  .header__burger {
+    display: flex;
+    z-index: 3000;
+  }
+  .header__overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.4s ease;
+    z-index: 1500;
+  }
+  .header__overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .header__nav {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 70%;
+    max-width: 420px;
+    height: 100vh;
+    background: linear-gradient(180deg, #0a0a0a, #111);
+    box-shadow: -15px 0 50px rgba(255, 0, 0, 0.15);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translateX(100%);
+    transition: 0.5s cubic-bezier(0.77, 0, 0.18, 1);
+    margin: 0;
+    z-index: 2000;
+  }
+  .header__nav.active {
+    transform: translateX(0);
+  }
+  .header__nav ul {
+    flex-direction: column;
+    gap: 40px;
+    padding: 0;
+  }
+  .header__nav ul li {
+    opacity: 0;
+    transform: translateX(40px);
+    transition: 0.4s ease;
+  }
+  .header__nav.active ul li {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .header__nav.active ul li:nth-child(1) {
+    transition-delay: 0.1s;
+  }
+  .header__nav.active ul li:nth-child(2) {
+    transition-delay: 0.2s;
+  }
+  .header__nav.active ul li:nth-child(3) {
+    transition-delay: 0.3s;
+  }
+  .header__nav.active ul li:nth-child(4) {
+    transition-delay: 0.4s;
+  }
+  .header__nav.active ul li:nth-child(5) {
+    transition-delay: 0.5s;
+  }
+  .header__nav a {
+    font-size: 28px;
+  }
+}
+@media (max-width: 768px) {
+  .header__logo {
+    margin-left: 20px;
+  }
+  .header__logo img {
+    max-width: 100px;
+  }
+}
+@media (max-width: 480px) {
+  .header__logo img {
+    max-width: 80px;
+  }
+}
+@font-face {
+  font-family: inter;
+  src: url(../fonts/Inter_18pt-Medium.ttf);
+}
+@font-face {
+  font-family: russoone;
+  src: url(../fonts/RussoOne-Regular.ttf);
+}/*# sourceMappingURL=header.css.map */
