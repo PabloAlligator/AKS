@@ -23,146 +23,197 @@ body {
 
 .hero {
     width: 100%;
-    min-height: 100vh;
+    height: 100vh;
     display: flex;
     align-items: center;
-    background:
-        linear-gradient(to top,
-            #000000 0%,
-            #000000 20%,
-            rgba(0, 0, 0, 0.9) 40%,
-            rgba(0, 0, 0, 0.7) 60%,
-            rgba(0, 0, 0, 0.4) 100%,
-            rgba(0, 0, 0, 0) 100%),
-        url('../img/фон.png');
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position:
-        left top,
-        90% center;
     position: relative;
-    padding: 100px 0 200px 0;
-    // overflow-x: hidden;
+    padding: 0;
+    overflow: hidden;
     z-index: 1;
+}
 
+.hero__video {
+     position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    z-index: -2;
+}
 
-    &-container {
-        display: flex;
-        flex-direction: column;
-        max-width: 1720px;
-        margin-left: 12%;
+.hero__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top,
+        #000000 0%,
+        #000000 20%,
+        rgba(0, 0, 0, 0.9) 40%,
+        rgba(0, 0, 0, 0.7) 60%,
+        rgba(0, 0, 0, 0.4) 80%,
+        rgba(0, 0, 0, 0) 100%);
+    z-index: -1;
+}
 
-        h2 {
-            font-size: 32px;
-            font-family: $RussoOne;
-            color: $red;
-            letter-spacing: 4px;
-            margin-bottom: 16px;
-        }
+.hero-container {
+    display: flex;
+    flex-direction: column;
+    max-width: 1720px;
+    margin-left: 12%;
+    position: relative;
+    z-index: 2;
+}
 
-        h1 {
-            font-size: 128px;
-            font-family: $RussoOne;
-            font-style: italic;
-            letter-spacing: 5px;
-            color: $white;
-            margin-bottom: 16px;
+.hero-container h2 {
+    font-size: 32px;
+    font-family: $RussoOne;
+    color: $red;
+    letter-spacing: 4px;
+    margin-bottom: 16px;
+}
 
-            span {
-                color: $red;
-            }
-        }
+.hero-container h1 {
+    font-size: 128px;
+    font-family: $RussoOne;
+    font-style: italic;
+    letter-spacing: 5px;
+    color: $white;
+    margin-bottom: 16px;
+}
 
-        p {
-            font-size: 24px;
-            line-height: 40px;
-            letter-spacing: 1px;
-            font-family: $inter;
-            padding-left: 24px;
-            border-left: 5px solid red;
-            color: $grey;
-            margin-bottom: 64px;
-        }
+.hero-container h1 span {
+    color: $red;
+}
 
-        .hero-container__btn {
-            display: flex;
-            justify-content: start;
-            gap: 24px;
-            flex-wrap: wrap;
+.hero-container p {
+    font-size: 24px;
+    line-height: 40px;
+    letter-spacing: 1px;
+    font-family: $inter;
+    padding-left: 24px;
+    border-left: 5px solid red;
+    color: $grey;
+    margin-bottom: 64px;
+}
 
-            &-start {
-                position: relative;
-                text-decoration: none;
-                color: $white;
-                padding: 24px 40px;
-                font-size: 32px;
-                font-family: $RussoOne;
-                background: $red;
-                border-radius: 8px;
-                z-index: 3;
-                transition: all 0.3s ease;
+.hero-container .hero-container__btn {
+    display: flex;
+    justify-content: start;
+    gap: 24px;
+    flex-wrap: wrap;
+}
 
+.hero-container .hero-container__btn-start {
+    position: relative;
+    text-decoration: none;
+    color: $white;
+    padding: 24px 40px;
+    font-size: 32px;
+    font-family: $RussoOne;
+    background: $red;
+    border-radius: 8px;
+    z-index: 3;
+    transition: all 0.3s ease;
+}
 
-                // &::before {
-                //     content: '';
-                //     position: absolute;
-                //     border-radius: 4px;
-                //     inset: 0;
-                //     background: red;
-                //     transform: skew(-15deg);
-                //     z-index: -1;
-                //     transition: all 0.3s ease;
-                // }
+.hero-container .hero-container__btn-start:hover {
+    color: black;
+    background: $white;
+}
 
-                &:hover {
-                    color: black;
-                    background: $white;
+.hero-container .hero-container__btn-start:hover::before {
+    background: $white;
+    scale: 1.05;
+}
 
-                    &::before {
-                        background: $white;
-                        scale: 1.05;
-                    }
-                }
-            }
+.hero-container .hero-container__btn-more {
+    position: relative;
+    text-decoration: none;
+    color: $white;
+    padding: 24px 40px;
+    font-size: 32px;
+    font-family: $RussoOne;
+    background: transparent;
+    border: 3px solid $white;
+    border-radius: 8px;
+    z-index: 3;
+    transition: all 0.3s ease;
+}
 
-            &-more {
-                position: relative;
-                text-decoration: none;
-                color: $white;
-                padding: 24px 40px;
-                font-size: 32px;
-                font-family: $RussoOne;
-                background: transparent;
-                border: 3px solid $white;
-                border-radius: 8px;
-                z-index: 3;
-                transition: all 0.3s ease;
+.hero-container .hero-container__btn-more:hover {
+    color: red;
+}
 
-
-                // &::before {
-                //     content: '';
-                //     position: absolute;
-                //     inset: 0;
-                //     border-radius: 4px;
-                //     background: transparent;
-                //     transform: skew(-15deg);
-                //     z-index: -1;
-                //     border: 4px solid $white;
-                //     transition: all 0.3s ease;
-                // }
-
-                &:hover {
-                    color: red;
-
-                    &::before {
-                        background: $white;
-                        scale: 1.05;
-                    }
-                }
-            }
-        }
+.hero-container .hero-container__btn-more:hover::before {
+    background: $white;
+    scale: 1.05;
+}
+/* Адаптация для больших экранов (от 1920px и выше) */
+@media (min-width: 1920px) {
+    .hero {
+        height: 100vh;
+        width:100%;
+    }
+    
+    .hero__video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .hero-container h1 {
+        font-size: 160px;
+    }
+    
+    .hero-container h2 {
+        font-size: 40px;
+    }
+    
+    .hero-container p {
+        font-size: 28px;
+        max-width: 80%;
     }
 }
+
+/* Для очень широких экранов (2560px+) */
+@media (min-width: 2560px) {
+    .hero-container {
+        max-width: 2200px;
+        margin-left: 15%;
+    }
+    
+    .hero-container h1 {
+        font-size: 200px;
+    }
+    
+    .hero-container h2 {
+        font-size: 48px;
+    }
+    
+    .hero-container p {
+        font-size: 32px;
+        max-width: 70%;
+    }
+}
+
+/* Альтернативный вариант: вместо обрезки - масштабирование с сохранением пропорций */
+@media (min-aspect-ratio: 16/9) {
+    .hero__video {
+        height: auto;
+        width: 100%;
+    }
+}
+
+// @media (max-aspect-ratio: 16/9) {
+//     .hero__video {
+//         height: 100%;
+//         width: auto;
+//     }
+// }
 
 @media (max-width: 1366px) {
     .hero {
@@ -239,6 +290,9 @@ body {
     .hero {
         padding: 64px 12px 100px;
         background-position: center center;
+        // height: auto;
+        // min-height: 100vh;
+        // padding: 80px 0;
 
         &-container {
             margin: 0 auto;
@@ -977,6 +1031,8 @@ body {
     color: $white;
     position: relative;
     overflow: hidden;
+    // display: flex;
+    // flex-direction: row-reverse;
 
     &__container {
         position: relative;
@@ -984,7 +1040,7 @@ body {
         max-width: 1720px;
         margin: 0 auto;
         display: flex;
-        flex-direction: row;
+        flex-direction: row-reverse;
         flex-wrap: nowrap;
         gap: 40px;
         align-items: center;
