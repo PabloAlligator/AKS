@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://autocat19.ru/sitemap.xml
+
+Host: autocat19.ru
