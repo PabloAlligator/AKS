@@ -2330,3 +2330,120 @@ body.modal-open {
   font-family: russoone;
   src: url(../fonts/RussoOne-Regular.ttf);
 }
+.team {
+  padding: 120px 20px;
+  text-align: center;
+  color: white;
+}
+.team__title {
+  font-size: 48px;
+  margin-bottom: 60px;
+  font-family: russoone;
+}
+.team__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.team__card {
+  display: block;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  text-decoration: none;
+  color: white;
+  transition: 0.3s;
+}
+.team__card img {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+.team__card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(255, 0, 0, 0.4);
+}
+
+.team__card {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.team__card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 30px 50px -15px rgba(255, 0, 0, 0.4);
+}
+.team__card img {
+  display: block;
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.team__card:hover img {
+  transform: scale(1.05);
+}
+
+.employee {
+  padding: 140px 20px;
+}
+.employee__container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.employee {
+  padding: 120px 20px;
+  display: flex;
+  justify-content: center;
+}
+.employee__container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.employee__card {
+  max-width: 600px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 40px;
+  border-radius: 12px;
+  text-align: center;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.employee__card img {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+}
+.employee__card h1 {
+  margin-bottom: 20px;
+}
+.employee__card p {
+  margin-bottom: 10px;
+  color: #aaa;
+}
+
+.employee__info {
+  margin: 20px 0;
+}
+.employee__info p {
+  font-size: 16px;
+  color: #ccc;
+}
+.employee__info strong {
+  color: rgba(255, 0, 0, 0.8);
+}
+
+.employee__text {
+  margin-top: 20px;
+}
+.employee__text p {
+  line-height: 28px;
+  color: #808080;
+}

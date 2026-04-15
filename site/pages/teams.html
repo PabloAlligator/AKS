@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="shortcut icon" href="../img/shortcutIcon.png" />
+    <title>Autocat19</title>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header__logo">
+        <a href="../../index.html">
+          <!-- <img src="site/img/logoMain.png"> -->
+          <img src="../img/logo/logo-Photoroom.png" alt="logo" />
+        </a>
+      </div>
+
+      <div class="header__overlay"></div>
+
+      <div class="header__burger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
+      <nav class="header__nav">
+        <ul>
+          <li><a href="../../index.html">ГЛАВНАЯ</a></li>
+          <li><a href="#uslugi">УСЛУГИ</a></li>
+          <li>
+            <a href="https://autocat19.ru/" target="_blank">КАТАЛИЗАТОР</a>
+          </li>
+          <!-- <li><a href="#contacts">КОНТАКТЫ</a></li> -->
+          <li><a href="#">КОМАНДА</a></li>
+          <li><a href="#connect">ЗАПИСАТЬСЯ</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="team">
+      <section class="team-intro">
+        <div class="team-intro__container">
+          <span class="team-intro__label">AUTOCAT19</span>
+          <h1 class="team__title">Команда Autocat19</h1>
+          <p class="team__subtitle">
+            В Autocat19 работают специалисты с практическим опытом в удалении и
+            замене катализаторов, диагностике, техническом обслуживании и
+            ремонте автомобилей любой сложности. От планового ТО до сложного
+            ремонта двигателя — с акцентом на качество, доступные цены и
+            понятный результат для клиента.
+          </p>
+          <p class="team__text">
+            Компьютерная диагностика и поиск неисправностей всех систем
+            автомобиля.
+          </p>
+        </div>
+      </section>
+
+      <div class="team__grid">
+        <!-- Карточка -->
+        <a href="../pages/employee-1.html" target="_blank" class="team__card">
+          <img src="../img/катализатор.png" alt="Мастер" />
+          <h3>Иван Иванов</h3>
+          <p>Мастер по двигателям</p>
+        </a>
+
+        <a href="../pages/employee-2.html" target="_blank" class="team__card">
+          <img src="../img/катализатор.png" alt="Мастер" />
+          <h3>Пётр Петров</h3>
+          <p>Диагност</p>
+        </a>
+      </div>
+    </main>
+
+    <!-- фора обратной связи -->
+
+    <section class="connect" id="connect">
+      <div class="connect__container">
+        <div class="connect-form">
+          <div class="form-card">
+            <h2 class="form-title">ЗАПИШИСЬ НА СЕРВИС</h2>
+
+            <!-- Успех -->
+            <div class="form-success" id="successMessage" style="display: none">
+              <h3>Заявка отправлена!</h3>
+              <p>Мы получили вашу заявку и свяжемся в ближайшее время.</p>
+              <button
+                type="button"
+                class="form-btn form-btn--secondary"
+                onclick="resetForm()"
+              >
+                Отправить ещё
+              </button>
+            </div>
+
+            <!-- Ошибка -->
+            <div class="form-error" id="errorMessage" style="display: none">
+              <div class="error-icon">✕</div>
+              <h3>Ошибка отправки</h3>
+              <p>Попробуйте позже или позвоните: +7 (983) 190-50-50</p>
+            </div>
+
+            <!-- Форма -->
+            <form class="form-content" id="connectForm">
+              <div class="form-group">
+                <input
+                  type="text"
+                  name="name"
+                  class="form-input"
+                  placeholder="Ваше имя"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <input
+                  type="tel"
+                  name="phone"
+                  class="form-input"
+                  placeholder="Телефон"
+                  required
+                  inputmode="tel"
+                  autocomplete="tel"
+                />
+              </div>
+
+              <div class="form-group">
+                <select name="service" class="form-input form-select" required>
+                  <option value="" disabled selected>Выберите услугу</option>
+                  <option value="Удаление катализатора">
+                    Удаление катализатора
+                  </option>
+                  <option value="Прошивка Евро-2">
+                    Прошивка Евро-2 + чип-тюнинг
+                  </option>
+                  <option value="Выкуп катализатора">Выкуп катализатора</option>
+                  <option value="Диагностика выхлопа">
+                    Диагностика выхлопной системы
+                  </option>
+                  <option value="Другое">Другое (укажите в комментарии)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <textarea
+                  name="comment"
+                  class="form-input form-textarea"
+                  placeholder="Комментарий / удобное время"
+                  rows="3"
+                ></textarea>
+              </div>
+
+              <button type="submit" class="form-btn" id="submitBtn">
+                <span class="btn-text">ЗАПИСАТЬСЯ БЕСПЛАТНО</span>
+              </button>
+
+              <p class="form-disclaimer">
+                Нажимая кнопку, вы соглашаетесь с
+                <a href="#" class="disclaimer-link"
+                  >политикой конфиденциальности</a
+                >
+              </p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- футер -->
+
+    <footer class="footer">
+      <div class="footer__inner">
+        <div class="footer__logo">
+          AUTOCAT SERVICE
+          <!-- <img src="site/img/logo3-Photoroom.png" alt=""> -->
+        </div>
+
+        <div class="footer__contacts">
+          <a href="tel:+79831905050" class="footer__phone"
+            >+7 (983) 190-50-50</a
+          >
+          <a href="tel:+73902214422" class="footer__phone"
+            >+7 (3902) 21-44-22</a
+          >
+          <a href="site/privacy-policy.html" target="_blank" class="footer-link"
+            >Политика конфиденциальности</a
+          >
+          <a
+            href="https://t.me/AutoCat19bot"
+            target="_blank"
+            class="footer__telegram"
+          >
+            Записаться в Telegram
+          </a>
+          <span class="footer__address">Абакан, Молодёжный квартал, 22ж</span>
+        </div>
+
+        <div class="footer__bottom">
+          <span class="footer__copy"
+            >© 2025–2026 AutoCat Service. Все права защищены.</span
+          >
+          <a
+            href="../privacy-policy.html"
+            target="_blank"
+            class="footer__policy"
+            >Политика конфиденциальности</a
+          >
+        </div>
+      </div>
+    </footer>
+    <!-- модалка услуги -->
+
+    <div class="service-modal" id="serviceModal" aria-hidden="true">
+      <div class="service-modal__overlay"></div>
+
+      <div
+        class="service-modal__dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="serviceModalTitle"
+      >
+        <button
+          class="service-modal__close"
+          type="button"
+          aria-label="Закрыть popup"
+        >
+          ×
+        </button>
+
+        <div class="service-modal__image-wrap">
+          <img
+            class="service-modal__image"
+            id="serviceModalImage"
+            src=""
+            alt=""
+          />
+        </div>
+
+        <div class="service-modal__content">
+          <h3 class="service-modal__title" id="serviceModalTitle"></h3>
+          <p class="service-modal__text" id="serviceModalText"></p>
+
+          <a
+            href="#connect"
+            class="service-modal__btn"
+            id="serviceModalFormLink"
+          >
+            Оставить заявку
+          </a>
+
+          <a
+            href="tel:+79233906649"
+            class="service-modal__phone"
+            id="serviceModalPhone"
+          >
+            <span class="service-modal__phone-label">Позвонить:</span>
+            <span class="service-modal__phone-number">+7 (983) 190-50-50</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="../script/scripts.js"></script>
+  </body>
+</html>
