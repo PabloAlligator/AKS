@@ -2814,3 +2814,281 @@ body.modal-open {
     color: $grey;
   }
 }
+// udalenie-katalizatora
+.service-hero {
+  position: relative;
+  padding: 180px 20px 100px;
+  background:
+    linear-gradient(rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.85)),
+    url("../img/uslugi/chip.jpg") center/cover no-repeat;
+  color: #fff;
+  overflow: hidden;
+
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  &__container {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 40px;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  &__label {
+    display: inline-block;
+    margin-bottom: 20px;
+    font-size: 14px;
+    letter-spacing: 0.18em;
+    color: #c9c9c9;
+  }
+
+  &__title {
+    margin: 0 0 24px;
+    font-size: clamp(40px, 6vw, 76px);
+    line-height: 0.95;
+    font-weight: 800;
+    text-transform: uppercase;
+
+    span {
+      color: #d2d2d2;
+    }
+  }
+
+  &__text {
+    max-width: 720px;
+    margin-bottom: 30px;
+    font-size: 18px;
+    line-height: 1.7;
+    color: #d8d8d8;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  &__features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+
+    li {
+      padding: 12px 18px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      font-size: 14px;
+    }
+  }
+
+  &__media {
+    display: flex;
+    justify-content: center;
+
+    img {
+      width: min(100%, 460px);
+      object-fit: contain;
+      filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.35));
+    }
+  }
+}
+
+.service-section {
+  padding: 110px 20px;
+  background: #111;
+  color: #fff;
+
+  &--dark {
+    background: #0b0b0b;
+  }
+
+  &--faq {
+    background: linear-gradient(180deg, #111 0%, #161616 100%);
+  }
+}
+
+.service-container {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.service-heading {
+  max-width: 760px;
+  margin-bottom: 48px;
+
+  span {
+    display: inline-block;
+    margin-bottom: 14px;
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    color: #a7a7a7;
+  }
+
+  h2 {
+    margin: 0 0 18px;
+    font-size: clamp(30px, 4vw, 52px);
+    line-height: 1.05;
+    text-transform: uppercase;
+  }
+
+  p {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.75;
+    color: #cfcfcf;
+  }
+}
+
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.service-card {
+  padding: 32px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: transform 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  h3 {
+    margin: 0 0 14px;
+    font-size: 24px;
+    text-transform: uppercase;
+  }
+
+  p {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.7;
+    color: #cfcfcf;
+  }
+}
+
+.service-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.service-step {
+  padding: 30px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  &__num {
+    margin-bottom: 18px;
+    font-size: 40px;
+    font-weight: 800;
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.18);
+  }
+
+  h3 {
+    margin: 0 0 12px;
+    font-size: 22px;
+    text-transform: uppercase;
+  }
+
+  p {
+    margin: 0;
+    color: #cfcfcf;
+    line-height: 1.7;
+  }
+}
+
+.faq-list {
+  display: grid;
+  gap: 20px;
+}
+
+.faq-item {
+  padding: 28px 30px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+
+  h3 {
+    margin: 0 0 12px;
+    font-size: 22px;
+  }
+
+  p {
+    margin: 0;
+    color: #d0d0d0;
+    line-height: 1.75;
+  }
+}
+
+@media (max-width: 992px) {
+  .service-hero {
+    padding: 150px 20px 80px;
+
+    &__container {
+      grid-template-columns: 1fr;
+    }
+
+    &__media {
+      order: -1;
+    }
+  }
+
+  .service-grid,
+  .service-steps {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .service-section {
+    padding: 80px 16px;
+  }
+
+  .service-hero {
+    padding: 130px 16px 70px;
+
+    &__text {
+      font-size: 16px;
+    }
+
+    &__features {
+      gap: 10px;
+
+      li {
+        width: 100%;
+        border-radius: 16px;
+      }
+    }
+  }
+
+  .service-grid,
+  .service-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .service-card,
+  .service-step,
+  .faq-item {
+    padding: 24px;
+  }
+}
