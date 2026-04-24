@@ -1,0 +1,18 @@
+{
+  "name": "autocat19",
+  "version": "1.0.0",
+  "description": "Autocat19 website backend",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "nodemailer": "^8.0.5"
+  }
+}

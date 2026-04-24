@@ -74,57 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// 4. EmailJS
-
-emailjs.init('r0VmzggkXuhBsXCeb'); // твой Public Key
-
-const form = document.getElementById('connectForm');
-const submitBtn = document.getElementById('submitBtn');
-const successMsg = document.getElementById('successMessage');
-const errorMsg = document.getElementById('errorMessage');
-const btnText = submitBtn?.querySelector('.btn-text');
-
-
-// 5. Нормализация телефона
-
-function normalizePhone(phone) {
-    if (!phone) return '';
-
-    // Убираем всё кроме цифр
-    let digits = phone.replace(/\D/g, '');
-
-    // 89233906649 -> ок
-    if (digits.length === 11 && digits.startsWith('8')) {
-        return digits;
-    }
-
-    // 79233906649 -> превращаем в 89233906649
-    if (digits.length === 11 && digits.startsWith('7')) {
-        return '8' + digits.slice(1);
-    }
-
-    // 9233906649 -> превращаем в 89233906649
-    if (digits.length === 10) {
-        return '8' + digits;
-    }
-
-    return '';
-}
-
-function isValidRussianPhone(phone) {
-    const normalized = normalizePhone(phone);
-    return /^89\d{9}$/.test(normalized);
-}
-
-function formatPhoneForSend(phone) {
-    const normalized = normalizePhone(phone);
-
-    if (!normalized) return '';
-
-    // 89233906649 -> +7 (923) 390-66-49
-    return `+7 (${normalized.slice(1, 4)}) ${normalized.slice(4, 7)}-${normalized.slice(7, 9)}-${normalized.slice(9, 11)}`;
-}
-
 
 // 6. Маска ввода телефона
 
@@ -155,126 +104,160 @@ if (phoneInput) {
 
 // 7. Отправка формы
 
+const form = document.getElementById('connectForm');
+const submitBtn = document.getElementById('submitBtn');
+const successMsg = document.getElementById('successMessage');
+const errorMsg = document.getElementById('errorMessage');
+const btnText = submitBtn?.querySelector('.btn-text');
+
+function normalizePhone(phone) {
+    if (!phone) return '';
+
+    let digits = phone.replace(/\D/g, '');
+
+    if (digits.length === 11 && digits.startsWith('8')) {
+        return digits;
+    }
+
+    if (digits.length === 11 && digits.startsWith('7')) {
+        return '8' + digits.slice(1);
+    }
+
+    if (digits.length === 10) {
+        return '8' + digits;
+    }
+
+    return '';
+}
+
+function isValidRussianPhone(phone) {
+    const normalized = normalizePhone(phone);
+    return /^89\d{9}$/.test(normalized);
+}
+
+function formatPhoneForSend(phone) {
+    const normalized = normalizePhone(phone);
+
+    if (!normalized) return '';
+
+    return `+7 (${normalized.slice(1, 4)}) ${normalized.slice(4, 7)}-${normalized.slice(7, 9)}-${normalized.slice(9, 11)}`;
+}
+
+function showFormError(title, text) {
+    if (!errorMsg) return;
+
+    errorMsg.style.display = 'block';
+    errorMsg.innerHTML = `
+        <div class="error-icon">✕</div>
+        <h3>${title}</h3>
+        <p>${text}</p>
+    `;
+}
+
+function resetFormState() {
+    if (errorMsg) errorMsg.style.display = 'none';
+    if (successMsg) successMsg.style.display = 'none';
+
+    if (submitBtn) submitBtn.disabled = false;
+    if (btnText) btnText.textContent = 'ЗАПИСАТЬСЯ БЕСПЛАТНО';
+}
+
 if (form) {
-    form.addEventListener('submit', function (e) {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        if (errorMsg) {
-            errorMsg.style.display = 'none';
-            errorMsg.innerHTML = `
-                <div class="error-icon">✕</div>
-                <h3>Ошибка отправки</h3>
-                <p>Попробуйте позже или позвоните: +7 (983) 190-50-50</p>
-            `;
-        }
+        resetFormState();
 
         const formData = new FormData(form);
 
-        const rawName = (formData.get('name') || '').toString().trim();
-        const rawPhone = (formData.get('phone') || '').toString().trim();
-        const rawService = (formData.get('service') || '').toString().trim();
-        const rawComment = (formData.get('comment') || '').toString().trim();
+        const name = (formData.get('name') || '').toString().trim();
+        const phone = (formData.get('phone') || '').toString().trim();
+        const service = (formData.get('service') || '').toString().trim();
+        const comment = (formData.get('comment') || '').toString().trim();
 
-        if (!rawName) {
-            if (errorMsg) {
-                errorMsg.style.display = 'block';
-                errorMsg.innerHTML = `
-                    <div class="error-icon">✕</div>
-                    <h3>Проверьте имя</h3>
-                    <p>Введите ваше имя.</p>
-                `;
-            }
+        if (!name) {
+            showFormError('Проверьте имя', 'Введите ваше имя.');
             return;
         }
 
-        if (!isValidRussianPhone(rawPhone)) {
-            if (errorMsg) {
-                errorMsg.style.display = 'block';
-                errorMsg.innerHTML = `
-                    <div class="error-icon">✕</div>
-                    <h3>Проверьте номер телефона</h3>
-                    <p>Введите номер в формате 89233906649, +79233906649 или 8 (923) 390-66-49.</p>
-                `;
-            }
+        if (name.length < 2 || name.length > 60) {
+            showFormError('Проверьте имя', 'Имя должно быть от 2 до 60 символов.');
             return;
         }
 
-        if (!rawService) {
-            if (errorMsg) {
-                errorMsg.style.display = 'block';
-                errorMsg.innerHTML = `
-                    <div class="error-icon">✕</div>
-                    <h3>Выберите услугу</h3>
-                    <p>Нужно выбрать услугу перед отправкой.</p>
-                `;
-            }
+        if (!isValidRussianPhone(phone)) {
+            showFormError(
+                'Проверьте номер телефона',
+                'Введите номер в формате 89233906649, +79233906649 или 8 (923) 390-66-49.'
+            );
             return;
         }
+
+        if (!service) {
+            showFormError('Выберите услугу', 'Нужно выбрать услугу перед отправкой.');
+            return;
+        }
+
+        if (comment.length > 800) {
+            showFormError('Слишком длинный комментарий', 'Комментарий должен быть не длиннее 800 символов.');
+            return;
+        }
+
+        const data = {
+            name,
+            phone: formatPhoneForSend(phone),
+            service,
+            comment: comment || '—',
+            page: window.location.pathname,
+            sendDate: new Date().toLocaleString('ru-RU')
+        };
 
         if (submitBtn) submitBtn.disabled = true;
         if (btnText) btnText.textContent = 'ОТПРАВЛЯЕМ...';
 
-        const data = {
-            name: rawName || '—',
-            phone: formatPhoneForSend(rawPhone) || rawPhone,
-            service: rawService || '—',
-            comment: rawComment || '—',
-            send_date: new Date().toLocaleString('ru-RU', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            })
-        };
-
-        console.log('Отправляемые данные:', data);
-
-        emailjs.send(
-            'service_qxejzo5', // ВСТАВЬ СЮДА СВОЙ НАСТОЯЩИЙ SERVICE ID
-            'template_kqa0m2l',
-            data
-        )
-            .then((response) => {
-                console.log('Успех EmailJS:', response.status, response.text);
-
-                if (successMsg) successMsg.style.display = 'block';
-                if (errorMsg) errorMsg.style.display = 'none';
-                form.style.display = 'none';
-
-                if (submitBtn) submitBtn.disabled = false;
-                if (btnText) btnText.textContent = 'ЗАПИСАТЬСЯ БЕСПЛАТНО';
-            })
-            .catch((err) => {
-                console.error('Ошибка EmailJS:', err);
-
-                if (errorMsg) {
-                    errorMsg.style.display = 'block';
-                    errorMsg.innerHTML = `
-                        <div class="error-icon">✕</div>
-                        <h3>Ошибка отправки</h3>
-                        <p>Попробуйте позже или позвоните: +7 (983) 190-50-50</p>
-                    `;
-                }
-
-                if (successMsg) successMsg.style.display = 'none';
-
-                if (submitBtn) submitBtn.disabled = false;
-                if (btnText) btnText.textContent = 'ЗАПИСАТЬСЯ БЕСПЛАТНО';
+        try {
+            const response = await fetch('/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
             });
+
+            const result = await response.json().catch(() => ({}));
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || 'Ошибка отправки');
+            }
+
+            if (successMsg) successMsg.style.display = 'block';
+            if (errorMsg) errorMsg.style.display = 'none';
+
+            form.reset();
+            form.style.display = 'none';
+        } catch (error) {
+            showFormError(
+                'Ошибка отправки',
+                'Попробуйте позже или позвоните: +7 (983) 190-50-50'
+            );
+        } finally {
+            if (submitBtn) submitBtn.disabled = false;
+            if (btnText) btnText.textContent = 'ЗАПИСАТЬСЯ БЕСПЛАТНО';
+        }
     });
 }
-
-
-// 8. Сброс формы
 
 function resetForm() {
     if (!form) return;
 
     form.reset();
     form.style.display = '';
+
     if (successMsg) successMsg.style.display = 'none';
     if (errorMsg) errorMsg.style.display = 'none';
+
+    if (submitBtn) submitBtn.disabled = false;
+    if (btnText) btnText.textContent = 'ЗАПИСАТЬСЯ БЕСПЛАТНО';
 }
 
 // модалка 
