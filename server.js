@@ -49,6 +49,14 @@ const transporter = nodemailer.createTransport({
     },
 });
 
+transporter.verify((error) => {
+    if (error) {
+        console.error('SMTP ошибка:', error);
+    } else {
+        console.log('SMTP готов к отправке писем');
+    }
+});
+
 function cleanText(value, maxLength = 500) {
     return String(value || '')
         .replace(/[<>]/g, '')
@@ -255,6 +263,16 @@ app.post('/send', sendLimiter, async (req, res) => {
 
         const date = new Date().toLocaleString('ru-RU', {
             timeZone: 'Asia/Krasnoyarsk',
+        });
+
+        console.log('🔥 Новая заявка:', {
+            name,
+            phone: formattedPhone,
+            service,
+            comment: comment || '—',
+            page: page || '—',
+            date,
+            ip: req.ip,
         });
 
         const text = `
