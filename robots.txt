@@ -1,6 +1,6 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://autocat19.ru/sitemap.xml
+Sitemap: https://autocat-abakan.ru/sitemap.xml
 
-Host: autocat19.ru
+Host: autocat-abakan.ru
