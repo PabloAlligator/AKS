@@ -26,6 +26,14 @@ app.use(
 app.use(express.json({ limit: '20kb' }));
 app.use(express.urlencoded({ extended: false, limit: '20kb' }));
 
+app.get('/site/udalenie-katalizatora.html', (req, res) => {
+    res.redirect(301, '/udalenie-katalizatora.html');
+});
+
+app.get('/udalenie-katalizatora.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'site', 'udalenie-katalizatora.html'));
+});
+
 app.use(express.static(__dirname));
 
 const sendLimiter = rateLimit({
