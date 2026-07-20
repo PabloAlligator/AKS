@@ -1,12 +1,19 @@
+import 'dotenv/config';
+
 import express from 'express';
 import nodemailer from 'nodemailer';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
-import dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import cookieParser from 'cookie-parser';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-dotenv.config();
+import authRoutes from './routes/auth.routes.js';
+import adminRoutes from './routes/admin.routes.js';
+import requireAuth from './middleware/require-auth.js';
+import requireRole from './middleware/require-role.js';
+import { buildLeadSearchText } from './utils/search.js';
+import prisma from './lib/prisma.js';
 
 const app = express();
 
@@ -18,101 +25,179 @@ const PORT = process.env.PORT || 3000;
 app.set('trust proxy', 1);
 
 app.use(
-    helmet({
-        contentSecurityPolicy: false,
-    })
+  helmet({
+    contentSecurityPolicy: false,
+  }),
 );
 
 app.use(express.json({ limit: '20kb' }));
 app.use(express.urlencoded({ extended: false, limit: '20kb' }));
+app.use(cookieParser());
+
+app.use('/admin/api/auth', authRoutes);
+app.use('/admin/api', adminRoutes);
+
+function sendAdminPage(fileName) {
+  return (req, res) => {
+    res.set('Cache-Control', 'no-store');
+    res.set('Pragma', 'no-cache');
+
+    return res.sendFile(path.join(__dirname, 'admin-pages', fileName));
+  };
+}
+
+// админка
+
+app.get('/admin/login', sendAdminPage('login.html'));
+
+app.get('/admin', requireAuth.page, (req, res) => {
+  const target =
+    req.auth.user.role === 'OWNER' ? '/admin/dashboard' : '/admin/requests';
+
+  return res.redirect(303, target);
+});
+
+app.get(
+  '/admin/dashboard',
+  requireAuth.page,
+  requireRole.page('OWNER'),
+  sendAdminPage('dashboard.html'),
+);
+
+app.get('/admin/requests', requireAuth.page, sendAdminPage('requests.html'));
+
+app.get(
+  '/admin/staff',
+  requireAuth.page,
+  requireRole.page('OWNER'),
+  sendAdminPage('staff.html'),
+);
+
+// публичные файлы
+
+app.get('/', (req, res) => {
+  return res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/index.html', (req, res) => {
+  return res.redirect(301, '/');
+});
+
+app.get('/robots.txt', (req, res) => {
+  return res.sendFile(path.join(__dirname, 'robots.txt'));
+});
+
+app.get('/sitemap.xml', (req, res) => {
+  return res.sendFile(path.join(__dirname, 'sitemap.xml'));
+});
+
+app.get('/404.html', (req, res) => {
+  return res.sendFile(path.join(__dirname, '404.html'));
+});
 
 app.get('/site/udalenie-katalizatora.html', (req, res) => {
-    res.redirect(301, '/udalenie-katalizatora.html');
+  return res.redirect(301, '/udalenie-katalizatora.html');
 });
 
 app.get('/udalenie-katalizatora.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'site', 'udalenie-katalizatora.html'));
+  return res.sendFile(
+    path.join(__dirname, 'site', 'udalenie-katalizatora.html'),
+  );
 });
 
-app.use(express.static(__dirname));
+app.use(
+  '/site',
+  express.static(path.join(__dirname, 'site'), {
+    index: false,
+    dotfiles: 'deny',
+  }),
+);
 
 const sendLimiter = rateLimit({
-    windowMs: 60 * 1000,
-    max: 2,
-    message: {
-        success: false,
-        message: 'Слишком много заявок. Попробуйте чуть позже.',
-    },
-    standardHeaders: true,
-    legacyHeaders: false,
+  windowMs: 60 * 1000,
+  max: 2,
+  message: {
+    success: false,
+    message: 'Слишком много заявок. Попробуйте чуть позже.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT),
-    secure: Number(process.env.SMTP_PORT) === 465,
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-    },
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT),
+  secure: Number(process.env.SMTP_PORT) === 465,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
 });
 
 transporter.verify((error) => {
-    if (error) {
-        console.error('SMTP ошибка:', error);
-    } else {
-        console.log('SMTP готов к отправке писем');
-    }
+  if (error) {
+    console.error('SMTP ошибка:', error);
+  } else {
+    console.log('SMTP готов к отправке писем');
+  }
 });
 
 function cleanText(value, maxLength = 500) {
-    return String(value || '')
-        .replace(/[<>]/g, '')
-        .replace(/\s+/g, ' ')
-        .trim()
-        .slice(0, maxLength);
+  return String(value || '')
+    .replace(/[<>]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, maxLength);
 }
 
 function normalizePhone(phone) {
-    const digits = String(phone || '').replace(/\D/g, '');
+  const digits = String(phone || '').replace(/\D/g, '');
 
-    if (digits.length === 11 && digits.startsWith('8')) {
-        return digits;
-    }
+  if (digits.length === 11 && digits.startsWith('8')) {
+    return digits;
+  }
 
-    if (digits.length === 11 && digits.startsWith('7')) {
-        return `8${digits.slice(1)}`;
-    }
+  if (digits.length === 11 && digits.startsWith('7')) {
+    return `8${digits.slice(1)}`;
+  }
 
-    if (digits.length === 10) {
-        return `8${digits}`;
-    }
+  if (digits.length === 10) {
+    return `8${digits}`;
+  }
 
-    return '';
+  return '';
 }
 
 function isValidPhone(phone) {
-    return /^89\d{9}$/.test(normalizePhone(phone));
+  return /^89\d{9}$/.test(normalizePhone(phone));
 }
 
 function formatPhone(phone) {
-    const normalized = normalizePhone(phone);
+  const normalized = normalizePhone(phone);
 
-    if (!normalized) return '';
+  if (!normalized) return '';
 
-    return `+7 (${normalized.slice(1, 4)}) ${normalized.slice(4, 7)}-${normalized.slice(7, 9)}-${normalized.slice(9, 11)}`;
+  return `+7 (${normalized.slice(1, 4)}) ${normalized.slice(4, 7)}-${normalized.slice(7, 9)}-${normalized.slice(9, 11)}`;
 }
 
 function makeTelLink(phone) {
-    const normalized = normalizePhone(phone);
+  const normalized = normalizePhone(phone);
 
-    if (!normalized) return '';
+  if (!normalized) return '';
 
-    return `+7${normalized.slice(1)}`;
+  return `+7${normalized.slice(1)}`;
 }
 
-function buildEmailTemplate({ name, formattedPhone, telLink, service, comment, page, date }) {
-    return `
+function buildEmailTemplate({
+  name,
+  formattedPhone,
+  telLink,
+  service,
+  comment,
+  page,
+  date,
+}) {
+  return `
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -238,94 +323,173 @@ function buildEmailTemplate({ name, formattedPhone, telLink, service, comment, p
 }
 
 app.post('/send', sendLimiter, async (req, res) => {
-    try {
-        const name = cleanText(req.body.name, 60);
-        const phone = cleanText(req.body.phone, 40);
-        const service = cleanText(req.body.service, 100);
-        const comment = cleanText(req.body.comment, 800);
-        const page = cleanText(req.body.page, 200);
+  try {
+    const name = cleanText(req.body.name, 60);
+    const phone = cleanText(req.body.phone, 40);
+    const service = cleanText(req.body.service, 100);
+    const comment = cleanText(req.body.comment, 800);
+    const page = cleanText(req.body.page, 200);
+    const website = cleanText(req.body.website, 200);
 
-        if (!name || name.length < 2) {
-            return res.status(400).json({
-                success: false,
-                message: 'Некорректное имя',
-            });
-        }
+    // антиспам-поле
 
-        if (!isValidPhone(phone)) {
-            return res.status(400).json({
-                success: false,
-                message: 'Некорректный телефон',
-            });
-        }
+    if (website) {
+      return res.json({
+        success: true,
+        message: 'Заявка отправлена',
+      });
+    }
 
-        if (!service) {
-            return res.status(400).json({
-                success: false,
-                message: 'Не выбрана услуга',
-            });
-        }
+    if (!name || name.length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: 'Некорректное имя',
+      });
+    }
 
-        const formattedPhone = formatPhone(phone);
-        const telLink = makeTelLink(phone);
+    if (!isValidPhone(phone)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Некорректный телефон',
+      });
+    }
 
-        const date = new Date().toLocaleString('ru-RU', {
-            timeZone: 'Asia/Krasnoyarsk',
-        });
+    if (!service) {
+      return res.status(400).json({
+        success: false,
+        message: 'Не выбрана услуга',
+      });
+    }
 
-        console.log('🔥 Новая заявка:', {
-            name,
-            phone: formattedPhone,
-            service,
-            comment: comment || '—',
-            page: page || '—',
-            date,
-            ip: req.ip,
-        });
+    const normalizedPhone = normalizePhone(phone);
+    const formattedPhone = formatPhone(normalizedPhone);
+    const telLink = makeTelLink(normalizedPhone);
 
-        const text = `
+    const source = cleanText(
+      page || req.get('referer') || 'Сайт Autocat19',
+      200,
+    );
+
+    const date = new Date().toLocaleString('ru-RU', {
+      timeZone: 'Asia/Krasnoyarsk',
+    });
+
+    // сохраняем заявку
+
+    const lead = await prisma.lead.create({
+      data: {
+        name,
+        phone: normalizedPhone,
+        service,
+        message: comment || null,
+        source: source || null,
+
+        searchText: buildLeadSearchText({
+          name,
+          phone: normalizedPhone,
+          service,
+          message: comment,
+          source,
+          internalComment: null,
+        }),
+
+        status: 'NEW',
+        emailSent: false,
+      },
+      select: {
+        id: true,
+        createdAt: true,
+      },
+    });
+
+    console.log('🔥 Новая заявка сохранена:', {
+      id: lead.id,
+      name,
+      phone: formattedPhone,
+      service,
+      comment: comment || '—',
+      source: source || '—',
+      date,
+      ip: req.ip,
+    });
+
+    const text = `
 Новая заявка с сайта Autocat19
 
+Номер заявки: ${lead.id}
 Имя: ${name}
 Телефон: ${formattedPhone}
 Услуга: ${service}
 Комментарий: ${comment || '—'}
-Страница: ${page || '—'}
+Страница: ${source || '—'}
 Дата: ${date}
-        `;
+    `;
 
-        const html = buildEmailTemplate({
-            name,
-            formattedPhone,
-            telLink,
-            service,
-            comment,
-            page,
-            date,
-        });
+    const html = buildEmailTemplate({
+      name,
+      formattedPhone,
+      telLink,
+      service,
+      comment,
+      page: source,
+      date,
+    });
 
-        await transporter.sendMail({
-            from: `"Autocat19" <${process.env.SMTP_USER}>`,
-            to: process.env.TO_EMAIL,
-            subject: `Заявка Autocat19: ${service}`,
-            text,
-            html,
-        });
+    // отправка письма не влияет на сохранение заявки
 
-        return res.json({
-            success: true,
-            message: 'Заявка отправлена',
-        });
-    } catch (error) {
-        console.error('Send error:', error);
+    try {
+      await transporter.sendMail({
+        from: `"Autocat19" <${process.env.SMTP_USER}>`,
+        to: process.env.TO_EMAIL,
+        subject: `Заявка №${lead.id} Autocat19: ${service}`,
+        text,
+        html,
+      });
 
-        return res.status(500).json({
-            success: false,
-            message: 'Ошибка сервера',
-        });
+      await prisma.lead.update({
+        where: {
+          id: lead.id,
+        },
+        data: {
+          emailSent: true,
+        },
+      });
+    } catch (mailError) {
+      console.error(
+        `Не удалось отправить письмо по заявке №${lead.id}:`,
+        mailError,
+      );
     }
+
+    return res.json({
+      success: true,
+      message: 'Заявка принята',
+    });
+  } catch (error) {
+    console.error('Send error:', error);
+
+    return res.status(500).json({
+      success: false,
+      message: 'Не удалось сохранить заявку',
+    });
+  }
+});
+
+// ошибки
+
+app.use((error, req, res, next) => {
+  console.error('Server error:', error);
+
+  if (res.headersSent) {
+    return next(error);
+  }
+
+  return res.status(500).json({
+    success: false,
+    message: 'Внутренняя ошибка сервера',
+  });
 });
 
 app.listen(PORT, () => {
-    console.log(`Autocat19 server started on port ${PORT}`);
+  console.log(`Autocat19 запущен: http://localhost:${PORT}`);
 });

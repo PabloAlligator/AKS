@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+
+    <meta name="theme-color" content="#070707" />
+
+    <title>Панель управления — Autocat19</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/site/css/admin.min.css" />
+
+    <script src="/site/script/admin/admin.js" defer></script>
+  </head>
+
+  <body class="admin-body" data-admin-page="dashboard">
+    <div class="admin-shell">
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar__head">
+          <a
+            class="admin-sidebar__logo"
+            href="/admin/dashboard"
+            aria-label="Autocat19 — панель управления"
+          >
+            <span class="admin-sidebar__logo-mark"> A </span>
+
+            <span class="admin-sidebar__logo-text"> AUTOCAT19 </span>
+          </a>
+
+          <span class="admin-sidebar__caption"> Control center </span>
+        </div>
+
+        <nav class="admin-sidebar__nav" aria-label="Навигация админ-панели">
+          <a
+            class="admin-sidebar__link admin-sidebar__link--active"
+            href="/admin/dashboard"
+          >
+            <span class="admin-sidebar__link-index"> 01 </span>
+
+            <span>Обзор</span>
+          </a>
+
+          <a class="admin-sidebar__link" href="/admin/requests">
+            <span class="admin-sidebar__link-index"> 02 </span>
+
+            <span>Заявки</span>
+          </a>
+
+          <span
+            class="admin-sidebar__link admin-sidebar__link--disabled"
+            data-owner-only
+          >
+            <span class="admin-sidebar__link-index"> 03 </span>
+
+            <span>Каталог</span>
+
+            <small>Скоро</small>
+          </span>
+
+          <a class="admin-sidebar__link" href="/admin/staff" data-owner-only>
+            <span class="admin-sidebar__link-index"> 04 </span>
+
+            <span>Сотрудники</span>
+          </a>
+        </nav>
+
+        <div class="admin-sidebar__bottom">
+          <a
+            class="admin-sidebar__site-link"
+            href="/"
+            target="_blank"
+            rel="noopener"
+          >
+            Открыть сайт
+          </a>
+
+          <button class="admin-sidebar__logout" type="button" data-admin-logout>
+            Выйти
+          </button>
+        </div>
+      </aside>
+
+      <main class="admin-main">
+        <header class="admin-header">
+          <div class="admin-header__heading">
+            <span class="admin-header__eyebrow">
+              Панель управления Autocat19
+            </span>
+
+            <h1 class="admin-header__title">
+              Добро пожаловать,
+              <span data-admin-user-name> пользователь </span>
+            </h1>
+          </div>
+
+          <div class="admin-user">
+            <div class="admin-user__indicator">
+              <span></span>
+
+              Система активна
+            </div>
+
+            <div class="admin-user__info">
+              <span class="admin-user__role" data-admin-user-role> — </span>
+
+              <span class="admin-user__email" data-admin-user-email> — </span>
+            </div>
+
+            <button
+              class="admin-user__logout-mobile"
+              type="button"
+              data-admin-logout
+            >
+              Выйти
+            </button>
+          </div>
+        </header>
+
+        <section class="admin-dashboard">
+          <div class="admin-dashboard__head">
+            <div class="admin-dashboard__intro">
+              <span class="admin-dashboard__caption"> Рабочая сводка </span>
+
+              <h2 class="admin-dashboard__title">Обзор автосервиса</h2>
+
+              <p class="admin-dashboard__text">
+                Актуальные обращения клиентов, состояние заявок и основные
+                показатели Autocat19.
+              </p>
+            </div>
+
+            <button
+              class="admin-dashboard__refresh"
+              type="button"
+              data-dashboard-refresh
+            >
+              Обновить данные
+            </button>
+          </div>
+
+          <div
+            class="admin-dashboard__message"
+            role="status"
+            aria-live="polite"
+            hidden
+            data-dashboard-message
+          ></div>
+
+          <div class="admin-dashboard__loading" data-dashboard-loading>
+            Загружаем данные…
+          </div>
+
+          <div class="admin-dashboard__content" data-dashboard-content hidden>
+            <div class="admin-dashboard__lead-stats">
+              <article class="admin-stat-card admin-stat-card--primary">
+                <span class="admin-stat-card__number"> 01 </span>
+
+                <span class="admin-stat-card__label"> Всего заявок </span>
+
+                <strong
+                  class="admin-stat-card__value"
+                  data-dashboard-lead-count="all"
+                >
+                  0
+                </strong>
+
+                <span class="admin-stat-card__note"> За всё время </span>
+              </article>
+
+              <article class="admin-stat-card">
+                <span class="admin-stat-card__number"> 02 </span>
+
+                <span class="admin-stat-card__label"> Новые </span>
+
+                <strong
+                  class="admin-stat-card__value"
+                  data-dashboard-lead-count="NEW"
+                >
+                  0
+                </strong>
+
+                <span class="admin-stat-card__note"> Ожидают обработки </span>
+              </article>
+
+              <article class="admin-stat-card">
+                <span class="admin-stat-card__number"> 03 </span>
+
+                <span class="admin-stat-card__label"> В работе </span>
+
+                <strong
+                  class="admin-stat-card__value"
+                  data-dashboard-lead-count="IN_PROGRESS"
+                >
+                  0
+                </strong>
+
+                <span class="admin-stat-card__note"> Обрабатываются </span>
+              </article>
+
+              <article class="admin-stat-card">
+                <span class="admin-stat-card__number"> 04 </span>
+
+                <span class="admin-stat-card__label"> Завершённые </span>
+
+                <strong
+                  class="admin-stat-card__value"
+                  data-dashboard-lead-count="COMPLETED"
+                >
+                  0
+                </strong>
+
+                <span class="admin-stat-card__note"> Успешно закрыты </span>
+              </article>
+
+              <article class="admin-stat-card">
+                <span class="admin-stat-card__number"> 05 </span>
+
+                <span class="admin-stat-card__label"> Отменённые </span>
+
+                <strong
+                  class="admin-stat-card__value"
+                  data-dashboard-lead-count="CANCELLED"
+                >
+                  0
+                </strong>
+
+                <span class="admin-stat-card__note"> Закрыты без услуги </span>
+              </article>
+            </div>
+
+            <div class="admin-dashboard__workspace">
+              <section class="admin-dashboard__latest">
+                <div class="admin-dashboard__section-head">
+                  <div>
+                    <span class="admin-dashboard__section-caption">
+                      Последние обращения
+                    </span>
+
+                    <h3 class="admin-dashboard__section-title">
+                      Свежие заявки
+                    </h3>
+                  </div>
+
+                  <a
+                    class="admin-dashboard__section-link"
+                    href="/admin/requests"
+                  >
+                    Все заявки
+                  </a>
+                </div>
+
+                <div
+                  class="admin-dashboard__latest-list"
+                  data-dashboard-latest-leads
+                ></div>
+
+                <div class="admin-dashboard__empty" data-dashboard-empty hidden>
+                  <strong> Заявок пока нет </strong>
+
+                  <span> Новые обращения с сайта появятся здесь. </span>
+                </div>
+              </section>
+
+              <aside class="admin-dashboard__system">
+                <div class="admin-dashboard__section-head">
+                  <div>
+                    <span class="admin-dashboard__section-caption">
+                      Система
+                    </span>
+
+                    <h3 class="admin-dashboard__section-title">
+                      Состояние панели
+                    </h3>
+                  </div>
+                </div>
+
+                <div class="admin-system-card">
+                  <span class="admin-system-card__label">
+                    Активные пользователи
+                  </span>
+
+                  <strong
+                    class="admin-system-card__value"
+                    data-dashboard-content-count="activeStaff"
+                  >
+                    0
+                  </strong>
+                </div>
+
+                <div class="admin-system-card">
+                  <span class="admin-system-card__label">
+                    Сохранение заявок
+                  </span>
+
+                  <strong class="admin-system-card__status"> Работает </strong>
+                </div>
+
+                <div class="admin-system-card">
+                  <span class="admin-system-card__label">
+                    Email-уведомления
+                  </span>
+
+                  <strong class="admin-system-card__status">
+                    Подключены
+                  </strong>
+                </div>
+
+                <a
+                  class="admin-dashboard__requests-link"
+                  href="/admin/requests"
+                >
+                  Перейти к заявкам
+                </a>
+              </aside>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

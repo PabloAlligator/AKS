@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+
+    <meta
+      name="robots"
+      content="noindex, nofollow, noarchive"
+    />
+
+    <meta
+      name="theme-color"
+      content="#070707"
+    />
+
+    <title>Сотрудники — Autocat19</title>
+
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
+
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="/site/css/admin.min.css"
+    />
+
+    <script
+      src="/site/script/admin/admin.js"
+      defer
+    ></script>
+  </head>
+
+  <body
+    class="admin-body"
+    data-admin-page="staff"
+  >
+    <div class="admin-shell">
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar__head">
+          <a
+            class="admin-sidebar__logo"
+            href="/admin/dashboard"
+            aria-label="Autocat19 — панель управления"
+          >
+            <span class="admin-sidebar__logo-mark">
+              A
+            </span>
+
+            <span class="admin-sidebar__logo-text">
+              AUTOCAT19
+            </span>
+          </a>
+
+          <span class="admin-sidebar__caption">
+            Control center
+          </span>
+        </div>
+
+        <nav
+          class="admin-sidebar__nav"
+          aria-label="Навигация админ-панели"
+        >
+          <a
+            class="admin-sidebar__link"
+            href="/admin/dashboard"
+          >
+            <span class="admin-sidebar__link-index">
+              01
+            </span>
+
+            <span>Обзор</span>
+          </a>
+
+          <a
+            class="admin-sidebar__link"
+            href="/admin/requests"
+          >
+            <span class="admin-sidebar__link-index">
+              02
+            </span>
+
+            <span>Заявки</span>
+          </a>
+
+          <span
+            class="admin-sidebar__link admin-sidebar__link--disabled"
+          >
+            <span class="admin-sidebar__link-index">
+              03
+            </span>
+
+            <span>Каталог</span>
+
+            <small>Скоро</small>
+          </span>
+
+          <a
+            class="admin-sidebar__link admin-sidebar__link--active"
+            href="/admin/staff"
+          >
+            <span class="admin-sidebar__link-index">
+              04
+            </span>
+
+            <span>Сотрудники</span>
+          </a>
+        </nav>
+
+        <div class="admin-sidebar__bottom">
+          <a
+            class="admin-sidebar__site-link"
+            href="/"
+            target="_blank"
+            rel="noopener"
+          >
+            Открыть сайт
+          </a>
+
+          <button
+            class="admin-sidebar__logout"
+            type="button"
+            data-admin-logout
+          >
+            Выйти
+          </button>
+        </div>
+      </aside>
+
+      <main class="admin-main">
+        <header class="admin-header">
+          <div class="admin-header__heading">
+            <span class="admin-header__eyebrow">
+              Управление доступом
+            </span>
+
+            <h1 class="admin-header__title">
+              Сотрудники
+            </h1>
+          </div>
+
+          <div class="admin-user">
+            <div class="admin-user__indicator">
+              <span></span>
+              Система активна
+            </div>
+
+            <div class="admin-user__info">
+              <span
+                class="admin-user__role"
+                data-admin-user-role
+              >
+                —
+              </span>
+
+              <span
+                class="admin-user__email"
+                data-admin-user-email
+              >
+                —
+              </span>
+            </div>
+
+            <button
+              class="admin-user__logout-mobile"
+              type="button"
+              data-admin-logout
+            >
+              Выйти
+            </button>
+          </div>
+        </header>
+
+        <section class="admin-staff">
+          <div class="admin-staff__head">
+            <div class="admin-staff__intro">
+              <span class="admin-staff__caption">
+                Команда Autocat19
+              </span>
+
+              <h2 class="admin-staff__title">
+                Доступ к заявкам
+              </h2>
+
+              <p class="admin-staff__description">
+                Сотрудники могут просматривать заявки,
+                менять их статусы и оставлять внутренние
+                комментарии. Остальные разделы им
+                недоступны.
+              </p>
+            </div>
+
+            <button
+              class="admin-staff__create"
+              type="button"
+              data-staff-create
+            >
+              Добавить сотрудника
+            </button>
+          </div>
+
+          <div class="admin-staff__stats">
+            <article
+              class="admin-staff-stat admin-staff-stat--primary"
+            >
+              <span class="admin-staff-stat__label">
+                Всего
+              </span>
+
+              <strong
+                class="admin-staff-stat__value"
+                data-staff-count="all"
+              >
+                0
+              </strong>
+            </article>
+
+            <article class="admin-staff-stat">
+              <span class="admin-staff-stat__label">
+                Активные
+              </span>
+
+              <strong
+                class="admin-staff-stat__value"
+                data-staff-count="active"
+              >
+                0
+              </strong>
+            </article>
+
+            <article class="admin-staff-stat">
+              <span class="admin-staff-stat__label">
+                Заблокированные
+              </span>
+
+              <strong
+                class="admin-staff-stat__value"
+                data-staff-count="blocked"
+              >
+                0
+              </strong>
+            </article>
+          </div>
+
+          <div
+            class="admin-staff__message"
+            role="status"
+            aria-live="polite"
+            hidden
+            data-staff-message
+          ></div>
+
+          <div
+            class="admin-staff__loading"
+            data-staff-loading
+          >
+            Загружаем сотрудников…
+          </div>
+
+          <div
+            class="admin-staff__empty"
+            data-staff-empty
+            hidden
+          >
+            <span class="admin-staff__empty-caption">
+              Команда
+            </span>
+
+            <h3 class="admin-staff__empty-title">
+              Сотрудников пока нет
+            </h3>
+
+            <p class="admin-staff__empty-text">
+              Создайте первый аккаунт для работы
+              с заявками.
+            </p>
+          </div>
+
+          <div
+            class="admin-staff__list"
+            data-staff-list
+            hidden
+          ></div>
+        </section>
+      </main>
+    </div>
+
+    <div
+      class="admin-staff-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="staffModalTitle"
+      hidden
+      data-staff-modal
+    >
+      <button
+        class="admin-staff-modal__backdrop"
+        type="button"
+        aria-label="Закрыть окно"
+        data-staff-modal-close
+      ></button>
+
+      <section class="admin-staff-modal__panel">
+        <header class="admin-staff-modal__header">
+          <div>
+            <span
+              class="admin-staff-modal__caption"
+              data-staff-modal-caption
+            >
+              Новый пользователь
+            </span>
+
+            <h2
+              class="admin-staff-modal__title"
+              id="staffModalTitle"
+              data-staff-modal-title
+            >
+              Добавить сотрудника
+            </h2>
+          </div>
+
+          <button
+            class="admin-staff-modal__close"
+            type="button"
+            aria-label="Закрыть"
+            data-staff-modal-close
+          >
+            ×
+          </button>
+        </header>
+
+        <form
+          class="admin-staff-modal__form"
+          data-staff-form
+        >
+          <label class="admin-staff-modal__field">
+            <span class="admin-staff-modal__label">
+              Имя сотрудника
+            </span>
+
+            <input
+              class="admin-staff-modal__input"
+              type="text"
+              name="name"
+              minlength="2"
+              maxlength="80"
+              autocomplete="name"
+              required
+              data-staff-name
+            />
+          </label>
+
+          <label class="admin-staff-modal__field">
+            <span class="admin-staff-modal__label">
+              Email для входа
+            </span>
+
+            <input
+              class="admin-staff-modal__input"
+              type="email"
+              name="email"
+              maxlength="254"
+              autocomplete="email"
+              required
+              data-staff-email
+            />
+          </label>
+
+          <label class="admin-staff-modal__field">
+            <span class="admin-staff-modal__label">
+              Пароль
+            </span>
+
+            <input
+              class="admin-staff-modal__input"
+              type="password"
+              name="password"
+              minlength="10"
+              maxlength="128"
+              autocomplete="new-password"
+              data-staff-password
+            />
+
+            <small class="admin-staff-modal__hint">
+              Минимум 10 символов. При редактировании
+              оставьте пустым, чтобы сохранить старый пароль.
+            </small>
+          </label>
+
+          <label
+            class="admin-staff-modal__toggle"
+            data-staff-active-field
+            hidden
+          >
+            <input
+              type="checkbox"
+              data-staff-active
+            />
+
+            <span
+              class="admin-staff-modal__toggle-control"
+            ></span>
+
+            <span>
+              <strong>Аккаунт активен</strong>
+              <small>
+                Заблокированный сотрудник не сможет
+                войти в панель.
+              </small>
+            </span>
+          </label>
+
+          <div
+            class="admin-staff-modal__message"
+            role="status"
+            aria-live="polite"
+            hidden
+            data-staff-form-message
+          ></div>
+
+          <div class="admin-staff-modal__actions">
+            <button
+              class="admin-staff-modal__save"
+              type="submit"
+              data-staff-save
+            >
+              Сохранить
+            </button>
+
+            <button
+              class="admin-staff-modal__delete"
+              type="button"
+              data-staff-delete
+              hidden
+            >
+              Удалить сотрудника
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </body>
+</html>

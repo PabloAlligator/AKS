@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum AdminRole {
+  OWNER
+  STAFF
+}
+
+enum LeadStatus {
+  NEW
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model AdminUser {
+  id           Int       @id @default(autoincrement())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         AdminRole @default(STAFF)
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  sessions      AdminSession[]
+  assignedLeads Lead[]         @relation("AssignedLeads")
+
+  @@index([role])
+  @@index([isActive])
+}
+
+model AdminSession {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  tokenHash     String   @unique
+  csrfTokenHash String
+  expiresAt     DateTime
+  lastUsedAt    DateTime @default(now())
+  ipAddress     String?
+  userAgent     String?
+  createdAt     DateTime @default(now())
+
+  user AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([lastUsedAt])
+}
+
+model Lead {
+  id              Int        @id @default(autoincrement())
+  name            String
+  phone           String
+  service         String
+  message         String?
+  source          String?
+  searchText      String     @default("")
+  status          LeadStatus @default(NEW)
+  internalComment String?
+  emailSent       Boolean    @default(false)
+  assignedToId    Int?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  assignedTo AdminUser? @relation("AssignedLeads", fields: [assignedToId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([phone])
+  @@index([createdAt])
+  @@index([assignedToId])
+}
