@@ -2421,7 +2421,7 @@ body.modal-open {
   overflow: hidden;
   padding: 140px 40px 90px;
   color: rgba(255, 255, 255, 0.9098039216);
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0.94) 0%, rgba(0, 0, 0, 0.78) 48%, rgba(0, 0, 0, 0.42) 100%), url("../img/katalizator.png") center/cover no-repeat;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.94) 0%, rgba(0, 0, 0, 0.78) 48%, rgba(0, 0, 0, 0.42) 100%), url("../img/katalizator.webp") center/cover no-repeat;
 }
 .service-hero__overlay {
   position: absolute;
