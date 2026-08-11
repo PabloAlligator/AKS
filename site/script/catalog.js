@@ -346,5 +346,6 @@ function initCatalogControls() {
 }
 
 window.AutoCatCatalog.initInquiry();
+window.AutoCatCatalog.initCartBadge();
 initCatalogControls();
 loadCatalog();

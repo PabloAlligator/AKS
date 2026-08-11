@@ -84,13 +84,7 @@
             <strong class="product-info__price" data-product-price
               >Цена по запросу</strong
             >
-            <button
-              class="product-info__request"
-              type="button"
-              data-product-request
-            >
-              Оставить заявку
-            </button>
+            <div class="product-info__cart" data-product-cart></div>
             <p class="product-info__note">
               Менеджер проверит совместимость и подтвердит заказ.
             </p>
@@ -216,5 +210,8 @@
         </form>
       </section>
     </div>
+    <a class="catalog-cart-fab" href="/cart" aria-label="Открыть корзину">
+      <span>Корзина</span><b data-cart-count hidden>0</b>
+    </a>
   </body>
 </html>

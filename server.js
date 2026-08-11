@@ -5,6 +5,7 @@ import nodemailer from 'nodemailer';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
+import { z } from 'zod';
 import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -134,6 +135,14 @@ app.get('/catalog', (req, res) => {
   return res.sendFile(path.join(__dirname, 'site', 'catalog.html'));
 });
 
+app.get('/cart.html', (req, res) => {
+  return res.redirect(301, '/cart');
+});
+
+app.get('/cart', (req, res) => {
+  return res.sendFile(path.join(__dirname, 'site', 'cart.html'));
+});
+
 app.get('/site/catalog.html', (req, res) => {
   return res.redirect(301, '/catalog');
 });
@@ -210,6 +219,115 @@ const sendLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+const cartItemsSchema = z
+  .array(
+    z.object({
+      productId: z.coerce.number().int().positive(),
+      quantity: z.coerce.number().int().min(1).max(99),
+    }),
+  )
+  .min(1)
+  .max(40)
+  .superRefine((items, context) => {
+    const ids = new Set();
+
+    items.forEach((item, index) => {
+      if (ids.has(item.productId)) {
+        context.addIssue({
+          code: 'custom',
+          message: 'Товар продублирован в корзине',
+          path: [index, 'productId'],
+        });
+      }
+
+      ids.add(item.productId);
+    });
+  });
+
+async function getCurrentCart(rawItems) {
+  const parsed = cartItemsSchema.safeParse(rawItems);
+
+  if (!parsed.success) {
+    return {
+      success: false,
+      status: 400,
+      message: 'Корзина содержит некорректные товары',
+    };
+  }
+
+  const products = await prisma.product.findMany({
+    where: {
+      id: {
+        in: parsed.data.map((item) => item.productId),
+      },
+      isActive: true,
+      OR: [
+        {
+          categoryId: null,
+        },
+        {
+          category: {
+            is: {
+              isActive: true,
+            },
+          },
+        },
+      ],
+    },
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      price: true,
+      priceFrom: true,
+      images: {
+        orderBy: {
+          sortOrder: 'asc',
+        },
+        take: 1,
+        select: {
+          path: true,
+          alt: true,
+        },
+      },
+    },
+  });
+  const productsById = new Map(products.map((product) => [product.id, product]));
+  const unavailableProductIds = parsed.data
+    .filter((item) => !productsById.has(item.productId))
+    .map((item) => item.productId);
+  const items = parsed.data.flatMap((item) => {
+    const product = productsById.get(item.productId);
+
+    if (!product) return [];
+
+    return [
+      {
+        id: product.id,
+        slug: product.slug,
+        name: product.name,
+        price: product.price,
+        priceFrom: product.priceFrom,
+        image: product.images[0] || null,
+        quantity: item.quantity,
+        lineTotal:
+          product.price === null ? null : product.price * item.quantity,
+      },
+    ];
+  });
+
+  return {
+    success: true,
+    items,
+    unavailableProductIds,
+    total: items.reduce(
+      (sum, item) => sum + (item.lineTotal === null ? 0 : item.lineTotal),
+      0,
+    ),
+    hasRequestPrice: items.some((item) => item.price === null),
+  };
+}
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -409,12 +527,12 @@ function buildEmailTemplate({
 `;
 }
 
-app.post('/send', sendLimiter, async (req, res) => {
+async function handleLeadRequest(req, res) {
   try {
     const name = cleanText(req.body.name, 60);
     const phone = cleanText(req.body.phone, 40);
     const service = cleanText(req.body.service, 100);
-    const comment = cleanText(req.body.comment, 800);
+    const comment = cleanText(req.body.comment, 5000);
     const page = cleanText(req.body.page, 200);
     const website = cleanText(req.body.website, 200);
 
@@ -560,7 +678,92 @@ app.post('/send', sendLimiter, async (req, res) => {
       message: 'Не удалось сохранить заявку',
     });
   }
+}
+
+app.post('/api/cart/quote', async (req, res) => {
+  try {
+    const quote = await getCurrentCart(req.body.items);
+
+    if (!quote.success) {
+      return res.status(quote.status).json({
+        success: false,
+        message: quote.message,
+      });
+    }
+
+    return res.json(quote);
+  } catch (error) {
+    console.error('Cart quote error:', error);
+
+    return res.status(500).json({
+      success: false,
+      message: 'Не удалось обновить корзину',
+    });
+  }
 });
+
+app.post('/api/cart/checkout', sendLimiter, async (req, res) => {
+  try {
+    const quote = await getCurrentCart(req.body.items);
+
+    if (!quote.success) {
+      return res.status(quote.status).json({
+        success: false,
+        message: quote.message,
+      });
+    }
+
+    if (quote.unavailableProductIds.length) {
+      return res.status(409).json({
+        success: false,
+        message: 'Один из товаров больше недоступен. Обновите корзину.',
+        unavailableProductIds: quote.unavailableProductIds,
+      });
+    }
+
+    const lines = quote.items.map((item, index) => {
+      const price =
+        item.price === null
+          ? 'цена по запросу'
+          : `${new Intl.NumberFormat('ru-RU').format(item.price)} ₽`;
+
+      return `${index + 1}. ${item.name} — ${item.quantity} шт. (${price})`;
+    });
+    const car = cleanText(req.body.car, 120);
+    const customerComment = cleanText(req.body.comment, 500);
+    const totalText = quote.hasRequestPrice
+      ? `Подтверждённая часть суммы: ${new Intl.NumberFormat('ru-RU').format(quote.total)} ₽`
+      : `Итого: ${new Intl.NumberFormat('ru-RU').format(quote.total)} ₽`;
+    const serverComment = [
+      `Товары по актуальным ценам:\n${lines.join('\n')}`,
+      totalText,
+      car ? `Автомобиль: ${car}` : '',
+      customerComment ? `Комментарий: ${customerComment}` : '',
+    ]
+      .filter(Boolean)
+      .join('\n\n');
+
+    req.body = {
+      name: req.body.name,
+      phone: req.body.phone,
+      service: `Заказ из корзины: ${quote.items.reduce((sum, item) => sum + item.quantity, 0)} шт.`,
+      comment: serverComment,
+      page: '/cart',
+      website: req.body.website,
+    };
+
+    return handleLeadRequest(req, res);
+  } catch (error) {
+    console.error('Cart checkout error:', error);
+
+    return res.status(500).json({
+      success: false,
+      message: 'Не удалось проверить товары перед заказом',
+    });
+  }
+});
+
+app.post('/send', sendLimiter, handleLeadRequest);
 
 // ошибки
 

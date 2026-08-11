@@ -128,9 +128,10 @@ function renderProduct(product, relatedProducts) {
     });
   });
 
-  document.querySelector('[data-product-request]')?.addEventListener('click', () => {
-    window.AutoCatCatalog.openInquiry(product);
-  });
+  const cartTarget = document.querySelector('[data-product-cart]');
+  if (cartTarget) {
+    cartTarget.replaceChildren(window.AutoCatCatalog.createCartControl(product, 'product-info'));
+  }
 
   renderSpecifications(product.specifications);
 
@@ -166,4 +167,5 @@ async function loadProduct() {
 }
 
 window.AutoCatCatalog.initInquiry();
+window.AutoCatCatalog.initCartBadge();
 loadProduct();

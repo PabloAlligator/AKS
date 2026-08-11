@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Корзина | Автокат Сервис</title>
+    <meta name="description" content="Корзина товаров Автокат Сервис." />
+    <meta name="robots" content="noindex, follow" />
+    <meta name="theme-color" content="#070707" />
+    <link rel="icon" href="/site/img/shortcutIcon.png" type="image/png" />
+    <link rel="stylesheet" href="/site/css/header.min.css" />
+    <link rel="stylesheet" href="/site/css/catalog.min.css" />
+    <script src="/site/script/scripts.js" defer></script>
+    <script src="/site/script/catalog-common.js" defer></script>
+    <script src="/site/script/cart.js" defer></script>
+  </head>
+  <body class="catalog-page cart-page">
+    <header class="header">
+      <div class="header__logo">
+        <a href="/"><img src="/site/img/logo/logo-Photoroom.webp" alt="Автокат Сервис" /></a>
+      </div>
+      <div class="header__overlay"></div>
+      <div class="header__burger" aria-label="Открыть меню" role="button" tabindex="0">
+        <span></span><span></span><span></span>
+      </div>
+      <nav class="header__nav">
+        <ul>
+          <li><a href="/">ГЛАВНАЯ</a></li>
+          <li><a href="/#uslugi">УСЛУГИ</a></li>
+          <li><a class="catalog-nav-active" href="/catalog">КАТАЛОГ</a></li>
+          <li><a href="/#about">О СЕРВИСЕ</a></li>
+          <li><a href="/#connect">ЗАПИСАТЬСЯ</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="cart-main">
+      <nav class="product-breadcrumbs" aria-label="Хлебные крошки">
+        <a href="/">Главная</a><span>/</span><a href="/catalog">Каталог</a><span>/</span><span>Корзина</span>
+      </nav>
+      <div class="cart-heading">
+        <div>
+          <span class="catalog-eyebrow">ВАШ ЗАКАЗ</span>
+          <h1>Корзина <small data-cart-heading-count></small></h1>
+        </div>
+        <button type="button" data-cart-clear>Очистить</button>
+      </div>
+      <p class="cart-status" role="status" hidden data-cart-status></p>
+
+      <section class="cart-layout" data-cart-content hidden>
+        <div class="cart-items" data-cart-items></div>
+        <aside class="cart-summary">
+          <h2>Ваш заказ</h2>
+          <dl>
+            <div><dt>Товаров</dt><dd data-cart-total-count>0</dd></div>
+            <div><dt>Сумма</dt><dd data-cart-total-price>0 ₽</dd></div>
+          </dl>
+          <p data-cart-price-note hidden>Цену части товаров уточнит менеджер.</p>
+          <button type="button" data-cart-checkout>Оформить заказ</button>
+          <small>Менеджер проверит совместимость, уточнит цену и позвонит вам.</small>
+        </aside>
+      </section>
+
+      <section class="cart-empty" data-cart-empty hidden>
+        <span>AC</span><h1>Корзина пуста</h1>
+        <p>Добавьте масла, катализаторы или расходники из каталога.</p>
+        <a href="/catalog">Перейти в каталог</a>
+      </section>
+    </main>
+
+    <footer class="catalog-footer">
+      <div class="catalog-footer__brand"><img src="/site/img/logo/logo-Photoroom.webp" alt="Автокат Сервис" /></div>
+      <div class="catalog-footer__contacts"><a href="tel:+79831905050">+7 (983) 190-50-50</a><span>Абакан, Молодёжный квартал, 22Ж</span><a href="/site/privacy-policy.html">Политика конфиденциальности</a></div>
+    </footer>
+
+    <div class="catalog-inquiry" role="dialog" aria-modal="true" hidden data-cart-checkout-modal>
+      <button class="catalog-inquiry__backdrop" type="button" aria-label="Закрыть" data-cart-checkout-close></button>
+      <section class="catalog-inquiry__panel">
+        <button class="catalog-inquiry__close" type="button" data-cart-checkout-close>Закрыть</button>
+        <span class="catalog-eyebrow">ОФОРМЛЕНИЕ ЗАКАЗА</span>
+        <h2>Как с вами связаться?</h2>
+        <p>Оставьте контакты — мы уточним все позиции и подтвердим заказ.</p>
+        <form class="catalog-inquiry__form" data-cart-form>
+          <label><span>Ваше имя</span><input type="text" name="name" minlength="2" maxlength="60" required /></label>
+          <label><span>Телефон</span><input type="tel" name="phone" maxlength="30" placeholder="+7 983 190-50-50" required /></label>
+          <label><span>Автомобиль</span><input type="text" name="car" maxlength="120" placeholder="Например, Toyota Camry 2012" /></label>
+          <label><span>Комментарий</span><textarea name="comment" maxlength="500" placeholder="Что нужно уточнить?"></textarea></label>
+          <label class="catalog-inquiry__website" aria-hidden="true"><span>Сайт</span><input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+          <button class="catalog-inquiry__submit" type="submit">Отправить заказ</button>
+          <div class="catalog-inquiry__message" role="status" hidden data-cart-message></div>
+          <small>Нажимая кнопку, вы соглашаетесь с <a href="/site/privacy-policy.html" target="_blank">политикой конфиденциальности</a>.</small>
+        </form>
+      </section>
+    </div>
+  </body>
+</html>

@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 import express from 'express';
 import multer from 'multer';
+import sharp from 'sharp';
 import { z } from 'zod';
 
 import prisma from '../lib/prisma.js';
@@ -23,28 +24,16 @@ fs.mkdirSync(uploadDirectory, {
   recursive: true,
 });
 
-const MIME_EXTENSIONS = {
-  'image/jpeg': '.jpg',
-  'image/png': '.png',
-  'image/webp': '.webp',
-};
-
-const storage = multer.diskStorage({
-  destination: uploadDirectory,
-  filename(req, file, callback) {
-    const extension = MIME_EXTENSIONS[file.mimetype] || '';
-    callback(null, `${Date.now()}-${crypto.randomUUID()}${extension}`);
-  },
-});
+const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: {
     fileSize: 6 * 1024 * 1024,
     files: 6,
   },
   fileFilter(req, file, callback) {
-    if (!MIME_EXTENSIONS[file.mimetype]) {
+    if (!ALLOWED_IMAGE_TYPES.has(file.mimetype)) {
       callback(new multer.MulterError('LIMIT_UNEXPECTED_FILE', file.fieldname));
       return;
     }
@@ -130,6 +119,44 @@ function parseProductBody(body) {
 
 function storedPath(file) {
   return `/site/uploads/products/${file.filename}`;
+}
+
+async function convertImagesToWebp(req, res, next) {
+  const convertedFiles = [];
+
+  try {
+    for (const file of req.files || []) {
+      const filename = `${Date.now()}-${crypto.randomUUID()}.webp`;
+      const outputPath = path.join(uploadDirectory, filename);
+
+      await sharp(file.buffer, { failOn: 'error' })
+        .rotate()
+        .resize({
+          width: 1600,
+          height: 1600,
+          fit: 'inside',
+          withoutEnlargement: true,
+        })
+        .webp({ quality: 84, effort: 4 })
+        .toFile(outputPath);
+
+      convertedFiles.push({
+        ...file,
+        buffer: undefined,
+        filename,
+        path: outputPath,
+        mimetype: 'image/webp',
+      });
+    }
+
+    req.files = convertedFiles;
+    next();
+  } catch {
+    cleanupUploadedFiles(convertedFiles);
+    res.status(400).json({
+      message: 'Не удалось обработать фотографию. Загрузите корректный JPG, PNG или WEBP',
+    });
+  }
 }
 
 function removeStoredPath(filePath) {
@@ -427,6 +454,7 @@ router.post(
   validateOrigin,
   requireCsrf,
   uploadImages,
+  convertImagesToWebp,
   async (req, res, next) => {
     try {
       const parsed = parseProductBody(req.body);
@@ -476,6 +504,7 @@ router.patch(
   validateOrigin,
   requireCsrf,
   uploadImages,
+  convertImagesToWebp,
   async (req, res, next) => {
     try {
       const parsedId = productIdSchema.safeParse(req.params.id);
