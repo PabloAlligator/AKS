@@ -77,3 +77,57 @@ model Lead {
   @@index([createdAt])
   @@index([assignedToId])
 }
+
+model ProductCategory {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  description String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products Product[]
+
+  @@index([isActive, sortOrder])
+}
+
+model Product {
+  id               Int      @id @default(autoincrement())
+  categoryId       Int?
+  name             String
+  slug             String   @unique
+  sku              String?
+  brand            String?
+  shortDescription String?
+  description      String?
+  specifications   String?
+  price            Int?
+  priceFrom        Boolean  @default(false)
+  isActive         Boolean  @default(true)
+  sortOrder        Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  category ProductCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  images   ProductImage[]
+
+  @@index([categoryId])
+  @@index([isActive, sortOrder])
+  @@index([brand])
+  @@index([sku])
+}
+
+model ProductImage {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  path      String
+  alt       String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId, sortOrder])
+}

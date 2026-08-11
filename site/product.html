@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{PRODUCT_TITLE}}</title>
+    <meta name="description" content="{{PRODUCT_DESCRIPTION}}" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="theme-color" content="#070707" />
+    <link rel="canonical" href="{{PRODUCT_CANONICAL}}" />
+    <link rel="icon" href="/site/img/shortcutIcon.png" type="image/png" />
+    <link rel="stylesheet" href="/site/css/header.min.css" />
+    <link rel="stylesheet" href="/site/css/catalog.min.css" />
+    <script src="/site/script/scripts.js" defer></script>
+    <script src="/site/script/catalog-common.js" defer></script>
+    <script src="/site/script/product.js" defer></script>
+  </head>
+
+  <body class="catalog-page product-page">
+    <header class="header">
+      <div class="header__logo">
+        <a href="/"
+          ><img src="/site/img/logo/logo-Photoroom.webp" alt="Автокат Сервис"
+        /></a>
+      </div>
+      <div class="header__overlay"></div>
+      <div
+        class="header__burger"
+        aria-label="Открыть меню"
+        role="button"
+        tabindex="0"
+      >
+        <span></span><span></span><span></span>
+      </div>
+      <nav class="header__nav">
+        <ul>
+          <li><a href="/">ГЛАВНАЯ</a></li>
+          <li><a href="/#uslugi">УСЛУГИ</a></li>
+          <li><a class="catalog-nav-active" href="/catalog">КАТАЛОГ</a></li>
+          <li><a href="/#about">О СЕРВИСЕ</a></li>
+          <li><a href="/#connect">ЗАПИСАТЬСЯ</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="product-main">
+      <div class="product-status" role="status" data-product-status>
+        Загружаем товар…
+      </div>
+
+      <div class="product-content" data-product-content hidden>
+        <nav class="product-breadcrumbs" aria-label="Хлебные крошки">
+          <a href="/">Главная</a><span>/</span><a href="/catalog">Каталог</a
+          ><span>/</span>
+          <span data-product-name>Товар</span>
+        </nav>
+
+        <section class="product-hero">
+          <div class="product-gallery">
+            <div class="product-gallery__main" data-product-main-image></div>
+            <div class="product-gallery__thumbs" data-product-thumbnails></div>
+          </div>
+
+          <div class="product-info">
+            <div class="product-info__category-line">
+              <span class="catalog-eyebrow" data-product-category
+                >Каталог AutoCat</span
+              >
+            </div>
+            <h1 data-product-name>Товар</h1>
+            <p class="product-info__summary" data-product-summary></p>
+
+            <dl class="product-info__meta">
+              <div>
+                <dt>Бренд</dt>
+                <dd data-product-brand>—</dd>
+              </div>
+              <div>
+                <dt>Артикул</dt>
+                <dd data-product-sku>—</dd>
+              </div>
+            </dl>
+
+            <strong class="product-info__price" data-product-price
+              >Цена по запросу</strong
+            >
+            <button
+              class="product-info__request"
+              type="button"
+              data-product-request
+            >
+              Оставить заявку
+            </button>
+            <p class="product-info__note">
+              Менеджер проверит совместимость и подтвердит заказ.
+            </p>
+          </div>
+        </section>
+
+        <section class="product-details">
+          <article class="product-details__section">
+            <h2>Описание</h2>
+            <p data-product-description></p>
+          </article>
+          <article class="product-details__section">
+            <h2>Характеристики</h2>
+            <dl class="product-details__specs" data-product-specifications></dl>
+          </article>
+        </section>
+
+        <section class="related-products" data-related-section hidden>
+          <div class="related-products__head">
+            <span class="catalog-eyebrow">МОЖЕТ ПОДОЙТИ</span>
+            <h2>Похожие товары</h2>
+          </div>
+          <div class="catalog-grid" data-related-grid></div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="catalog-footer">
+      <div class="catalog-footer__brand">
+        <img src="/site/img/logo/logo-Photoroom.webp" alt="Автокат Сервис" />
+      </div>
+      <div class="catalog-footer__contacts">
+        <a href="tel:+79831905050">+7 (983) 190-50-50</a>
+        <span>Абакан, Молодёжный квартал, 22Ж</span>
+        <a href="/site/privacy-policy.html">Политика конфиденциальности</a>
+      </div>
+    </footer>
+
+    <div
+      class="catalog-inquiry"
+      role="dialog"
+      aria-modal="true"
+      hidden
+      data-catalog-inquiry
+    >
+      <button
+        class="catalog-inquiry__backdrop"
+        type="button"
+        aria-label="Закрыть форму"
+        data-catalog-inquiry-close
+      ></button>
+      <section class="catalog-inquiry__panel">
+        <button
+          class="catalog-inquiry__close"
+          type="button"
+          aria-label="Закрыть"
+          data-catalog-inquiry-close
+        >
+          ×
+        </button>
+        <span class="catalog-eyebrow">ЗАЯВКА НА ТОВАР</span>
+        <h2 data-catalog-inquiry-product>Выбранный товар</h2>
+        <p>
+          Оставьте контакты — менеджер проверит совместимость и подтвердит
+          заказ.
+        </p>
+        <form class="catalog-inquiry__form" data-catalog-inquiry-form>
+          <input type="hidden" name="service" data-catalog-inquiry-service />
+          <input type="hidden" name="page" data-catalog-inquiry-page />
+          <label
+            ><span>Ваше имя</span
+            ><input
+              type="text"
+              name="name"
+              minlength="2"
+              maxlength="60"
+              required
+          /></label>
+          <label
+            ><span>Телефон</span
+            ><input
+              type="tel"
+              name="phone"
+              maxlength="30"
+              placeholder="+7 983 190-50-50"
+              required
+          /></label>
+          <label
+            ><span>Автомобиль</span
+            ><input
+              type="text"
+              name="car"
+              maxlength="120"
+              placeholder="Например, Toyota Camry 2012"
+          /></label>
+          <label
+            ><span>Комментарий</span
+            ><textarea
+              name="comment"
+              maxlength="500"
+              placeholder="Что нужно уточнить?"
+            ></textarea>
+          </label>
+          <label class="catalog-inquiry__website" aria-hidden="true"
+            ><span>Сайт</span
+            ><input type="text" name="website" tabindex="-1" autocomplete="off"
+          /></label>
+          <button class="catalog-inquiry__submit" type="submit">
+            Отправить заявку
+          </button>
+          <div
+            class="catalog-inquiry__message"
+            role="status"
+            hidden
+            data-catalog-inquiry-message
+          ></div>
+          <small
+            >Нажимая кнопку, вы соглашаетесь с
+            <a href="/site/privacy-policy.html" target="_blank"
+              >политикой конфиденциальности</a
+            >.</small
+          >
+        </form>
+      </section>
+    </div>
+  </body>
+</html>

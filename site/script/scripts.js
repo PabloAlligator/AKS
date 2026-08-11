@@ -4,14 +4,12 @@
 const burger = document.querySelector('.header__burger');
 const nav = document.querySelector('.header__nav');
 
-
 if (burger && nav) {
     burger.addEventListener('click', () => {
         burger.classList.toggle('active');
         nav.classList.toggle('active');
     });
 }
-
 
 // 2. Появление шапки при скролле
 
@@ -21,18 +19,18 @@ const header = document.querySelector('.header');
 if (header) {
     let lastScroll = 0;
     let ticking = false;
-    
+
     window.addEventListener('scroll', () => {
         if (!ticking) {
             requestAnimationFrame(() => {
                 const currentScroll = window.pageYOffset;
-                
+
                 if (currentScroll > lastScroll && currentScroll > 100) {
                     header.classList.add('hidden');
                 } else if (currentScroll < lastScroll && currentScroll < lastScroll - 10) {
                     header.classList.remove('hidden');
                 }
-                
+
                 lastScroll = currentScroll;
                 ticking = false;
             });
@@ -40,7 +38,6 @@ if (header) {
         }
     });
 }
-
 
 // 3. Плавный скролл к секциям
 
@@ -73,8 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-
-
 // 6. Маска ввода телефона
 
 const phoneInput = document.querySelector('input[name="phone"]');
@@ -100,7 +95,6 @@ if (phoneInput) {
         e.target.value = value;
     });
 }
-
 
 // 7. Отправка формы
 
@@ -260,10 +254,12 @@ function resetForm() {
     if (btnText) btnText.textContent = 'ЗАПИСАТЬСЯ БЕСПЛАТНО';
 }
 
-// модалка 
+// модалка
 
 document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('serviceModal');
+    if (!modal) return;
+
     const modalOverlay = modal.querySelector('.service-modal__overlay');
     const modalClose = modal.querySelector('.service-modal__close');
 

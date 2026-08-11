@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Каталог масел, катализаторов и расходников | Автокат Сервис</title>
+    <meta
+      name="description"
+      content="Каталог Автокат Сервис: масла, катализаторы и расходные материалы. Оставьте заявку — менеджер уточнит совместимость и подтвердит заказ."
+    />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="theme-color" content="#070707" />
+    <link rel="canonical" href="https://autocat-abakan.ru/catalog" />
+    <link rel="icon" href="/site/img/shortcutIcon.png" type="image/png" />
+    <link rel="stylesheet" href="/site/css/header.min.css" />
+    <link rel="stylesheet" href="/site/css/catalog.min.css" />
+    <script src="/site/script/scripts.js" defer></script>
+    <script src="/site/script/catalog-common.js" defer></script>
+    <script src="/site/script/catalog.js" defer></script>
+  </head>
+
+  <body class="catalog-page">
+    <header class="header">
+      <div class="header__logo">
+        <a href="/">
+          <img src="/site/img/logo/logo-Photoroom.webp" alt="Автокат Сервис" />
+        </a>
+      </div>
+      <div class="header__overlay"></div>
+      <div class="header__burger" aria-label="Открыть меню" role="button" tabindex="0">
+        <span></span><span></span><span></span>
+      </div>
+      <nav class="header__nav">
+        <ul>
+          <li><a href="/">ГЛАВНАЯ</a></li>
+          <li><a href="/#uslugi">УСЛУГИ</a></li>
+          <li><a class="catalog-nav-active" href="/catalog">КАТАЛОГ</a></li>
+          <li><a href="/#about">О СЕРВИСЕ</a></li>
+          <li><a href="/#connect">ЗАПИСАТЬСЯ</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section class="catalog-hero">
+        <div class="catalog-hero__inner">
+          <span class="catalog-eyebrow">АВТОКАТ СЕРВИС</span>
+          <h1>КАТАЛОГ ЗАПЧАСТЕЙ</h1>
+          <p>Масла, катализаторы и расходные материалы с установкой в Абакане</p>
+
+          <form class="catalog-search" data-catalog-search-form>
+            <label class="catalog-search__field">
+              <input
+                type="search"
+                maxlength="100"
+                placeholder="Название, артикул или категория"
+                aria-label="Поиск по каталогу"
+                data-catalog-search
+              />
+            </label>
+            <button class="catalog-search__submit" type="submit">Найти</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="catalog-category-nav" aria-label="Категории товаров">
+        <div class="catalog-category-nav__inner" data-catalog-categories></div>
+      </section>
+
+      <section class="catalog-products">
+        <div class="catalog-products__inner">
+          <div class="catalog-products__head">
+            <h2 data-catalog-heading>Все товары</h2>
+            <label class="catalog-sort">
+              <span>Сортировка:</span>
+              <select data-catalog-sort aria-label="Сортировка товаров">
+                <option value="default">По умолчанию</option>
+                <option value="price-asc">Сначала дешевле</option>
+                <option value="price-desc">Сначала дороже</option>
+                <option value="name">По названию</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="catalog-products__layout">
+            <aside class="catalog-sidebar" aria-label="Фильтры каталога">
+              <div class="catalog-sidebar__group">
+                <label for="catalog-category">Категория</label>
+                <select id="catalog-category" data-catalog-category-select>
+                  <option value="">Все категории</option>
+                </select>
+              </div>
+
+              <div class="catalog-sidebar__group">
+                <label for="catalog-brand">Бренд</label>
+                <select id="catalog-brand" data-catalog-brand>
+                  <option value="">Все бренды</option>
+                </select>
+              </div>
+
+              <fieldset class="catalog-sidebar__group catalog-sidebar__price">
+                <legend>Цена</legend>
+                <div class="catalog-sidebar__price-fields">
+                  <label>
+                    <span>от</span>
+                    <input type="number" min="0" step="100" inputmode="numeric" data-catalog-price-min />
+                  </label>
+                  <label>
+                    <span>до</span>
+                    <input type="number" min="0" step="100" inputmode="numeric" data-catalog-price-max />
+                  </label>
+                </div>
+              </fieldset>
+
+              <div class="catalog-sidebar__manager">
+                <strong>Как оформить заказ</strong>
+                <p>Оставьте заявку на товар. Менеджер проверит совместимость, свяжется с вами и подтвердит заказ.</p>
+              </div>
+
+              <button class="catalog-sidebar__reset" type="button" data-catalog-search-reset>
+                Сбросить фильтры
+              </button>
+            </aside>
+
+            <div class="catalog-listing">
+              <div class="catalog-status" role="status" data-catalog-status>
+                Загружаем товары…
+              </div>
+
+              <div class="catalog-grid" data-catalog-grid></div>
+
+              <div class="catalog-empty" data-catalog-empty hidden>
+                <span>По вашему запросу товаров пока нет</span>
+                <p>Измените фильтры или оставьте заявку на подбор по телефону.</p>
+                <a href="tel:+79831905050">+7 (983) 190-50-50</a>
+              </div>
+
+              <div class="catalog-pagination" data-catalog-pagination hidden>
+                <button type="button" data-catalog-page-prev>Назад</button>
+                <span data-catalog-page-info>1 / 1</span>
+                <button type="button" data-catalog-page-next>Вперёд</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="catalog-benefits" aria-label="Преимущества Автокат Сервис">
+        <div class="catalog-benefits__inner">
+          <div>
+            <img src="/site/img/icons8-open-end-wrench-50.webp" alt="" />
+            <span>Профессиональная установка</span>
+          </div>
+          <div>
+            <img src="/site/img/icons8-settings-50.webp" alt="" />
+            <span>Гарантия на запчасти и работы</span>
+          </div>
+          <div>
+            <img src="/site/img/icons8-location-50.webp" alt="" />
+            <span>Абакан, Молодёжный квартал, 22Ж</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="catalog-service">
+        <div class="catalog-service__inner">
+          <span class="catalog-eyebrow">НЕ ПРОСТО ПРОДАЁМ</span>
+          <h2>Проверим совместимость и установим в Автокат</h2>
+          <p>
+            Менеджер подтвердит товар, согласует стоимость и при необходимости запишет автомобиль на установку.
+          </p>
+          <a href="tel:+79831905050">Позвонить в сервис</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="catalog-footer">
+      <div class="catalog-footer__brand">
+        <img src="/site/img/logo/logo-Photoroom.webp" alt="Автокат Сервис" />
+      </div>
+      <div class="catalog-footer__contacts">
+        <a href="tel:+79831905050">+7 (983) 190-50-50</a>
+        <span>Абакан, Молодёжный квартал, 22Ж</span>
+        <a href="/site/privacy-policy.html">Политика конфиденциальности</a>
+      </div>
+    </footer>
+
+    <div class="catalog-inquiry" role="dialog" aria-modal="true" hidden data-catalog-inquiry>
+      <button
+        class="catalog-inquiry__backdrop"
+        type="button"
+        aria-label="Закрыть форму"
+        data-catalog-inquiry-close
+      ></button>
+      <section class="catalog-inquiry__panel">
+        <button
+          class="catalog-inquiry__close"
+          type="button"
+          aria-label="Закрыть"
+          data-catalog-inquiry-close
+        >Закрыть</button>
+        <span class="catalog-eyebrow">ЗАЯВКА НА ТОВАР</span>
+        <h2 data-catalog-inquiry-product>Выбранный товар</h2>
+        <p>Оставьте контакты — менеджер проверит совместимость и подтвердит заказ.</p>
+
+        <form class="catalog-inquiry__form" data-catalog-inquiry-form>
+          <input type="hidden" name="service" data-catalog-inquiry-service />
+          <input type="hidden" name="page" data-catalog-inquiry-page />
+          <label>
+            <span>Ваше имя</span>
+            <input type="text" name="name" minlength="2" maxlength="60" required />
+          </label>
+          <label>
+            <span>Телефон</span>
+            <input type="tel" name="phone" maxlength="30" placeholder="+7 983 190-50-50" required />
+          </label>
+          <label>
+            <span>Автомобиль</span>
+            <input type="text" name="car" maxlength="120" placeholder="Например, Toyota Camry 2012" />
+          </label>
+          <label>
+            <span>Комментарий</span>
+            <textarea name="comment" maxlength="500" placeholder="Что нужно уточнить?"></textarea>
+          </label>
+          <label class="catalog-inquiry__website" aria-hidden="true">
+            <span>Сайт</span><input type="text" name="website" tabindex="-1" autocomplete="off" />
+          </label>
+          <button class="catalog-inquiry__submit" type="submit">Отправить заявку</button>
+          <div class="catalog-inquiry__message" role="status" hidden data-catalog-inquiry-message></div>
+          <small>
+            Нажимая кнопку, вы соглашаетесь с
+            <a href="/site/privacy-policy.html" target="_blank">политикой конфиденциальности</a>.
+          </small>
+        </form>
+      </section>
+    </div>
+  </body>
+</html>

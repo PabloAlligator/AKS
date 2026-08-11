@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <meta name="theme-color" content="#070707" />
+    <title>Каталог — Autocat19</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/site/css/admin.min.css" />
+    <script src="/site/script/admin/admin.js" defer></script>
+  </head>
+
+  <body class="admin-body" data-admin-page="catalog">
+    <div class="admin-shell">
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar__head">
+          <a class="admin-sidebar__logo" href="/admin/dashboard" aria-label="Autocat19 — панель управления">
+            <span class="admin-sidebar__logo-mark">A</span>
+            <span class="admin-sidebar__logo-text">AUTOCAT19</span>
+          </a>
+          <span class="admin-sidebar__caption">Control center</span>
+        </div>
+
+        <nav class="admin-sidebar__nav" aria-label="Навигация админ-панели">
+          <a class="admin-sidebar__link" href="/admin/dashboard">
+            <span class="admin-sidebar__link-index">01</span><span>Обзор</span>
+          </a>
+          <a class="admin-sidebar__link" href="/admin/requests">
+            <span class="admin-sidebar__link-index">02</span><span>Заявки</span>
+          </a>
+          <a class="admin-sidebar__link admin-sidebar__link--active" href="/admin/catalog">
+            <span class="admin-sidebar__link-index">03</span><span>Каталог</span>
+          </a>
+          <a class="admin-sidebar__link" href="/admin/staff">
+            <span class="admin-sidebar__link-index">04</span><span>Сотрудники</span>
+          </a>
+        </nav>
+
+        <div class="admin-sidebar__bottom">
+          <a class="admin-sidebar__site-link" href="/catalog" target="_blank" rel="noopener">Открыть каталог</a>
+          <button class="admin-sidebar__logout" type="button" data-admin-logout>Выйти</button>
+        </div>
+      </aside>
+
+      <main class="admin-main">
+        <header class="admin-header">
+          <div class="admin-header__heading">
+            <span class="admin-header__eyebrow">Товары и категории</span>
+            <h1 class="admin-header__title">Каталог</h1>
+          </div>
+          <div class="admin-user">
+            <div class="admin-user__indicator"><span></span>Система активна</div>
+            <div class="admin-user__info">
+              <span class="admin-user__role" data-admin-user-role>—</span>
+              <span class="admin-user__email" data-admin-user-email>—</span>
+            </div>
+            <button class="admin-user__logout-mobile" type="button" data-admin-logout>Выйти</button>
+          </div>
+        </header>
+
+        <section class="admin-catalog">
+          <div class="admin-catalog__head">
+            <div>
+              <span class="admin-catalog__caption">Витрина AutoCat</span>
+              <h2 class="admin-catalog__title">Управление товарами</h2>
+              <p class="admin-catalog__description">
+                Добавляйте масла, катализаторы и расходники. Клиенты оставляют заявку, а менеджер подтверждает заказ.
+              </p>
+            </div>
+            <div class="admin-catalog__head-actions">
+              <button class="admin-catalog__secondary" type="button" data-catalog-category-open>Категории</button>
+              <button class="admin-catalog__create" type="button" data-catalog-product-create>Добавить товар</button>
+            </div>
+          </div>
+
+          <div class="admin-catalog__stats">
+            <article class="admin-catalog-stat admin-catalog-stat--primary">
+              <span>Всего товаров</span><strong data-admin-catalog-count="all">0</strong>
+            </article>
+            <article class="admin-catalog-stat">
+              <span>Опубликованы</span><strong data-admin-catalog-count="active">0</strong>
+            </article>
+            <article class="admin-catalog-stat">
+              <span>Скрыты</span><strong data-admin-catalog-count="hidden">0</strong>
+            </article>
+          </div>
+
+          <div class="admin-catalog__toolbar">
+            <label class="admin-catalog__search">
+              <span>Поиск</span>
+              <input type="search" maxlength="100" placeholder="Название, бренд или артикул" data-admin-catalog-search />
+            </label>
+            <label class="admin-catalog__filter">
+              <span>Категория</span>
+              <select data-admin-catalog-category-filter>
+                <option value="">Все категории</option>
+              </select>
+            </label>
+            <label class="admin-catalog__filter">
+              <span>Публикация</span>
+              <select data-admin-catalog-status-filter>
+                <option value="">Все товары</option>
+                <option value="active">Опубликованы</option>
+                <option value="hidden">Скрыты</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="admin-catalog__message" role="status" aria-live="polite" hidden data-admin-catalog-message></div>
+          <div class="admin-catalog__loading" data-admin-catalog-loading>Загружаем каталог…</div>
+          <div class="admin-catalog__empty" data-admin-catalog-empty hidden>
+            <span>Каталог пока пуст</span>
+            <p>Добавьте первый товар — он сразу появится на публичной витрине.</p>
+          </div>
+          <div class="admin-catalog__grid" data-admin-catalog-grid hidden></div>
+        </section>
+      </main>
+    </div>
+
+    <div class="admin-catalog-modal" role="dialog" aria-modal="true" hidden data-catalog-product-modal>
+      <button class="admin-catalog-modal__backdrop" type="button" aria-label="Закрыть" data-catalog-product-close></button>
+      <section class="admin-catalog-modal__panel">
+        <header class="admin-catalog-modal__header">
+          <div>
+            <span data-catalog-product-caption>Новый товар</span>
+            <h2 data-catalog-product-title>Добавить товар</h2>
+          </div>
+          <button type="button" aria-label="Закрыть" data-catalog-product-close>×</button>
+        </header>
+
+        <form class="admin-catalog-modal__form" data-catalog-product-form>
+          <label class="admin-catalog-modal__field admin-catalog-modal__field--wide">
+            <span>Название товара *</span>
+            <input type="text" name="name" minlength="2" maxlength="160" required data-catalog-product-name />
+          </label>
+          <label class="admin-catalog-modal__field">
+            <span>Категория</span>
+            <select name="categoryId" data-catalog-product-category><option value="">Без категории</option></select>
+          </label>
+          <label class="admin-catalog-modal__field">
+            <span>Бренд</span>
+            <input type="text" name="brand" maxlength="100" data-catalog-product-brand />
+          </label>
+          <label class="admin-catalog-modal__field">
+            <span>Артикул</span>
+            <input type="text" name="sku" maxlength="80" data-catalog-product-sku />
+          </label>
+          <label class="admin-catalog-modal__field">
+            <span>Адрес страницы</span>
+            <input type="text" name="slug" maxlength="140" placeholder="Создастся автоматически" data-catalog-product-slug />
+          </label>
+          <label class="admin-catalog-modal__field">
+            <span>Цена, ₽</span>
+            <input type="number" name="price" min="0" max="100000000" step="1" placeholder="Пусто — цена по запросу" data-catalog-product-price />
+          </label>
+          <label class="admin-catalog-modal__field">
+            <span>Порядок</span>
+            <input type="number" name="sortOrder" min="-100000" max="100000" step="1" value="0" data-catalog-product-order />
+          </label>
+          <label class="admin-catalog-modal__field admin-catalog-modal__field--wide">
+            <span>Короткое описание</span>
+            <input type="text" name="shortDescription" maxlength="240" placeholder="Например: Синтетическое · 4 л" data-catalog-product-short />
+          </label>
+          <label class="admin-catalog-modal__field admin-catalog-modal__field--wide">
+            <span>Описание</span>
+            <textarea name="description" maxlength="5000" data-catalog-product-description></textarea>
+          </label>
+          <label class="admin-catalog-modal__field admin-catalog-modal__field--wide">
+            <span>Характеристики</span>
+            <textarea name="specifications" maxlength="5000" placeholder="По одной в строке:&#10;Объём: 4 л&#10;Вязкость: 5W-40" data-catalog-product-specifications></textarea>
+          </label>
+          <label class="admin-catalog-modal__field admin-catalog-modal__field--wide">
+            <span>Фотографии</span>
+            <input type="file" name="images" accept="image/jpeg,image/png,image/webp" multiple data-catalog-product-images />
+            <small>До 6 фотографий, каждая не больше 6 МБ. JPG, PNG или WEBP.</small>
+          </label>
+
+          <div class="admin-catalog-modal__images admin-catalog-modal__field--wide" data-catalog-product-existing-images hidden></div>
+
+          <div class="admin-catalog-modal__toggles admin-catalog-modal__field--wide">
+            <label><input type="checkbox" data-catalog-product-price-from /><span>Показывать «от» перед ценой</span></label>
+            <label><input type="checkbox" checked data-catalog-product-active /><span>Опубликовать товар</span></label>
+          </div>
+
+          <div class="admin-catalog-modal__message admin-catalog-modal__field--wide" role="status" hidden data-catalog-product-message></div>
+          <div class="admin-catalog-modal__actions admin-catalog-modal__field--wide">
+            <button class="admin-catalog-modal__save" type="submit" data-catalog-product-save>Сохранить товар</button>
+            <button class="admin-catalog-modal__delete" type="button" hidden data-catalog-product-delete>Удалить товар</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <div class="admin-catalog-modal" role="dialog" aria-modal="true" hidden data-catalog-category-modal>
+      <button class="admin-catalog-modal__backdrop" type="button" aria-label="Закрыть" data-catalog-category-close></button>
+      <section class="admin-catalog-modal__panel admin-catalog-modal__panel--categories">
+        <header class="admin-catalog-modal__header">
+          <div><span>Структура каталога</span><h2>Категории</h2></div>
+          <button type="button" aria-label="Закрыть" data-catalog-category-close>×</button>
+        </header>
+
+        <div class="admin-category-manager">
+          <div class="admin-category-manager__list" data-catalog-category-list></div>
+          <form class="admin-category-manager__form" data-catalog-category-form>
+            <h3 data-catalog-category-form-title>Новая категория</h3>
+            <label><span>Название *</span><input type="text" minlength="2" maxlength="80" required data-catalog-category-name /></label>
+            <label><span>Адрес</span><input type="text" maxlength="120" placeholder="Создастся автоматически" data-catalog-category-slug /></label>
+            <label><span>Описание</span><textarea maxlength="300" data-catalog-category-description></textarea></label>
+            <label><span>Порядок</span><input type="number" min="-100000" max="100000" value="0" data-catalog-category-order /></label>
+            <label class="admin-category-manager__toggle"><input type="checkbox" checked data-catalog-category-active /><span>Категория опубликована</span></label>
+            <div class="admin-category-manager__message" role="status" hidden data-catalog-category-message></div>
+            <div class="admin-category-manager__actions">
+              <button type="submit" data-catalog-category-save>Сохранить</button>
+              <button type="button" data-catalog-category-reset>Новая</button>
+              <button type="button" hidden data-catalog-category-delete>Удалить</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

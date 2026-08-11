@@ -97,6 +97,25 @@ async function requestJson(url, options = {}) {
   };
 }
 
+async function requestFormData(url, formData, options = {}) {
+  const response = await fetch(url, {
+    credentials: 'same-origin',
+    method: options.method || 'POST',
+    headers: {
+      Accept: 'application/json',
+      ...(options.headers || {}),
+    },
+    body: formData,
+  });
+
+  const data = await response.json().catch(() => null);
+
+  return {
+    response,
+    data,
+  };
+}
+
 function redirectToLogin() {
   window.location.replace('/admin/login');
 }
@@ -2335,6 +2354,532 @@ async function initStaffPage() {
   }
 }
 
+/* CATALOG */
+
+const catalogAdminState = {
+  products: [],
+  categories: [],
+  activeProduct: null,
+  activeCategory: null,
+  removeImageIds: new Set(),
+};
+
+function setAdminCatalogMessage(message, type = 'error') {
+  const element = document.querySelector('[data-admin-catalog-message]');
+
+  if (!element) return;
+
+  element.textContent = message;
+  element.hidden = !message;
+  element.classList.toggle('admin-catalog__message--success', type === 'success');
+}
+
+function setAdminCatalogLoading(isLoading) {
+  const loading = document.querySelector('[data-admin-catalog-loading]');
+  const grid = document.querySelector('[data-admin-catalog-grid]');
+
+  if (loading) loading.hidden = !isLoading;
+  if (grid && isLoading) grid.hidden = true;
+}
+
+function formatCatalogPrice(product) {
+  if (product.price === null || product.price === undefined) {
+    return 'Цена по запросу';
+  }
+
+  return `${product.priceFrom ? 'от ' : ''}${new Intl.NumberFormat('ru-RU').format(product.price)} ₽`;
+}
+
+function renderAdminCatalogCounts(counts = {}) {
+  document.querySelectorAll('[data-admin-catalog-count]').forEach((element) => {
+    element.textContent = counts[element.dataset.adminCatalogCount] || 0;
+  });
+}
+
+function createAdminCatalogCard(product) {
+  const article = document.createElement('article');
+  article.className = 'admin-catalog-card';
+  article.classList.toggle('admin-catalog-card--hidden', !product.isActive);
+
+  const imageWrap = document.createElement('div');
+  imageWrap.className = 'admin-catalog-card__image';
+  const image = product.images?.[0];
+
+  if (image) {
+    const img = document.createElement('img');
+    img.src = image.path;
+    img.alt = image.alt || product.name;
+    imageWrap.append(img);
+  } else {
+    const placeholder = document.createElement('span');
+    placeholder.textContent = 'AC';
+    imageWrap.append(placeholder);
+  }
+
+  const state = document.createElement('span');
+  state.className = product.isActive
+    ? 'admin-catalog-card__state admin-catalog-card__state--active'
+    : 'admin-catalog-card__state';
+  state.textContent = product.isActive ? 'Опубликован' : 'Скрыт';
+  imageWrap.append(state);
+
+  const body = document.createElement('div');
+  body.className = 'admin-catalog-card__body';
+
+  const category = document.createElement('span');
+  category.className = 'admin-catalog-card__category';
+  category.textContent = product.category?.name || 'Без категории';
+
+  const name = document.createElement('h3');
+  name.textContent = product.name;
+
+  const meta = document.createElement('p');
+  meta.textContent = [product.brand, product.sku ? `Арт. ${product.sku}` : '']
+    .filter(Boolean)
+    .join(' · ') || 'Бренд и артикул не указаны';
+
+  const price = document.createElement('strong');
+  price.textContent = formatCatalogPrice(product);
+
+  const actions = document.createElement('div');
+  actions.className = 'admin-catalog-card__actions';
+
+  const edit = document.createElement('button');
+  edit.type = 'button';
+  edit.textContent = 'Редактировать';
+  edit.dataset.catalogProductEdit = String(product.id);
+
+  const view = document.createElement('a');
+  view.href = `/catalog/${product.slug}`;
+  view.target = '_blank';
+  view.rel = 'noopener';
+  view.textContent = 'На сайте';
+
+  actions.append(edit, view);
+  body.append(category, name, meta, price, actions);
+  article.append(imageWrap, body);
+
+  return article;
+}
+
+function getFilteredAdminProducts() {
+  const search = document.querySelector('[data-admin-catalog-search]')?.value.trim().toLowerCase() || '';
+  const category = document.querySelector('[data-admin-catalog-category-filter]')?.value || '';
+  const status = document.querySelector('[data-admin-catalog-status-filter]')?.value || '';
+
+  return catalogAdminState.products.filter((product) => {
+    const haystack = [product.name, product.brand, product.sku, product.category?.name]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+    const matchesSearch = !search || haystack.includes(search);
+    const matchesCategory = !category || String(product.categoryId || '') === category;
+    const matchesStatus =
+      !status ||
+      (status === 'active' && product.isActive) ||
+      (status === 'hidden' && !product.isActive);
+
+    return matchesSearch && matchesCategory && matchesStatus;
+  });
+}
+
+function renderAdminProducts() {
+  const grid = document.querySelector('[data-admin-catalog-grid]');
+  const empty = document.querySelector('[data-admin-catalog-empty]');
+
+  if (!grid || !empty) return;
+
+  const products = getFilteredAdminProducts();
+  grid.replaceChildren(...products.map(createAdminCatalogCard));
+  grid.hidden = products.length === 0;
+  empty.hidden = products.length > 0;
+}
+
+function fillAdminCategorySelects() {
+  const productSelect = document.querySelector('[data-catalog-product-category]');
+  const filterSelect = document.querySelector('[data-admin-catalog-category-filter]');
+  const currentProductValue = productSelect?.value || '';
+  const currentFilterValue = filterSelect?.value || '';
+
+  if (productSelect) {
+    productSelect.replaceChildren(new Option('Без категории', ''));
+  }
+
+  if (filterSelect) {
+    filterSelect.replaceChildren(new Option('Все категории', ''));
+  }
+
+  catalogAdminState.categories.forEach((category) => {
+    productSelect?.append(new Option(category.name, String(category.id)));
+    filterSelect?.append(new Option(category.name, String(category.id)));
+  });
+
+  if (productSelect) productSelect.value = currentProductValue;
+  if (filterSelect) filterSelect.value = currentFilterValue;
+}
+
+async function loadAdminCatalog() {
+  setAdminCatalogLoading(true);
+  setAdminCatalogMessage('');
+
+  try {
+    const { response, data } = await requestJson('/admin/api/catalog');
+
+    if (response.status === 401) {
+      redirectToLogin();
+      return;
+    }
+
+    if (!response.ok) {
+      throw new Error(data?.message || 'Не удалось загрузить каталог');
+    }
+
+    catalogAdminState.products = data.products || [];
+    catalogAdminState.categories = data.categories || [];
+    renderAdminCatalogCounts(data.counts);
+    fillAdminCategorySelects();
+    renderAdminProducts();
+    renderAdminCategoryList();
+  } catch (error) {
+    setAdminCatalogMessage(error.message || 'Не удалось загрузить каталог');
+  } finally {
+    setAdminCatalogLoading(false);
+  }
+}
+
+function setProductModalMessage(message, type = 'error') {
+  const element = document.querySelector('[data-catalog-product-message]');
+  if (!element) return;
+  element.textContent = message;
+  element.hidden = !message;
+  element.classList.toggle('admin-catalog-modal__message--success', type === 'success');
+}
+
+function renderExistingProductImages(product) {
+  const container = document.querySelector('[data-catalog-product-existing-images]');
+  if (!container) return;
+
+  container.replaceChildren();
+  const images = product?.images || [];
+  container.hidden = images.length === 0;
+
+  images.forEach((image) => {
+    const item = document.createElement('div');
+    item.className = 'admin-catalog-modal__image';
+    const img = document.createElement('img');
+    img.src = image.path;
+    img.alt = image.alt || product.name;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = 'Удалить';
+    button.addEventListener('click', () => {
+      const isRemoved = catalogAdminState.removeImageIds.has(image.id);
+
+      if (isRemoved) {
+        catalogAdminState.removeImageIds.delete(image.id);
+        item.classList.remove('admin-catalog-modal__image--removed');
+        button.textContent = 'Удалить';
+      } else {
+        catalogAdminState.removeImageIds.add(image.id);
+        item.classList.add('admin-catalog-modal__image--removed');
+        button.textContent = 'Вернуть';
+      }
+    });
+    item.append(img, button);
+    container.append(item);
+  });
+}
+
+function openProductModal(product = null) {
+  const modal = document.querySelector('[data-catalog-product-modal]');
+  const form = document.querySelector('[data-catalog-product-form]');
+  if (!modal || !form) return;
+
+  catalogAdminState.activeProduct = product;
+  catalogAdminState.removeImageIds.clear();
+  form.reset();
+  document.querySelector('[data-catalog-product-active]').checked = product?.isActive ?? true;
+  document.querySelector('[data-catalog-product-price-from]').checked = product?.priceFrom ?? false;
+  document.querySelector('[data-catalog-product-name]').value = product?.name || '';
+  document.querySelector('[data-catalog-product-category]').value = product?.categoryId || '';
+  document.querySelector('[data-catalog-product-brand]').value = product?.brand || '';
+  document.querySelector('[data-catalog-product-sku]').value = product?.sku || '';
+  document.querySelector('[data-catalog-product-slug]').value = product?.slug || '';
+  document.querySelector('[data-catalog-product-price]').value = product?.price ?? '';
+  document.querySelector('[data-catalog-product-order]').value = product?.sortOrder ?? 0;
+  document.querySelector('[data-catalog-product-short]').value = product?.shortDescription || '';
+  document.querySelector('[data-catalog-product-description]').value = product?.description || '';
+  document.querySelector('[data-catalog-product-specifications]').value = product?.specifications || '';
+  document.querySelector('[data-catalog-product-caption]').textContent = product ? 'Редактирование товара' : 'Новый товар';
+  document.querySelector('[data-catalog-product-title]').textContent = product ? product.name : 'Добавить товар';
+  document.querySelector('[data-catalog-product-delete]').hidden = !product;
+  renderExistingProductImages(product);
+  setProductModalMessage('');
+  modal.hidden = false;
+  document.body.classList.add('admin-body--modal-open');
+}
+
+function closeProductModal() {
+  const modal = document.querySelector('[data-catalog-product-modal]');
+  if (modal) modal.hidden = true;
+  catalogAdminState.activeProduct = null;
+  catalogAdminState.removeImageIds.clear();
+  document.body.classList.remove('admin-body--modal-open');
+}
+
+async function saveAdminProduct(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    return;
+  }
+
+  const product = catalogAdminState.activeProduct;
+  const submit = document.querySelector('[data-catalog-product-save]');
+  setProductModalMessage('');
+  submit.disabled = true;
+  submit.textContent = 'Сохраняем…';
+
+  try {
+    const csrfToken = await getCsrfToken();
+    if (!csrfToken) return;
+    const formData = new FormData(form);
+    formData.set('priceFrom', String(document.querySelector('[data-catalog-product-price-from]').checked));
+    formData.set('isActive', String(document.querySelector('[data-catalog-product-active]').checked));
+    formData.set('removeImageIds', JSON.stringify([...catalogAdminState.removeImageIds]));
+    const url = product ? `/admin/api/catalog/products/${product.id}` : '/admin/api/catalog/products';
+    const { response, data } = await requestFormData(url, formData, {
+      method: product ? 'PATCH' : 'POST',
+      headers: {
+        'X-CSRF-Token': csrfToken,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(data?.message || 'Не удалось сохранить товар');
+    }
+
+    setProductModalMessage('Товар сохранён', 'success');
+    await loadAdminCatalog();
+    window.setTimeout(closeProductModal, 500);
+  } catch (error) {
+    setProductModalMessage(error.message || 'Не удалось сохранить товар');
+  } finally {
+    submit.disabled = false;
+    submit.textContent = 'Сохранить товар';
+  }
+}
+
+async function deleteAdminProduct() {
+  const product = catalogAdminState.activeProduct;
+  if (!product || !window.confirm(`Удалить товар «${product.name}»? Это действие нельзя отменить.`)) return;
+
+  const button = document.querySelector('[data-catalog-product-delete]');
+  button.disabled = true;
+
+  try {
+    const csrfToken = await getCsrfToken();
+    const { response, data } = await requestJson(`/admin/api/catalog/products/${product.id}`, {
+      method: 'DELETE',
+      headers: {
+        'X-CSRF-Token': csrfToken,
+      },
+    });
+
+    if (!response.ok) throw new Error(data?.message || 'Не удалось удалить товар');
+    closeProductModal();
+    await loadAdminCatalog();
+    setAdminCatalogMessage('Товар удалён', 'success');
+  } catch (error) {
+    setProductModalMessage(error.message || 'Не удалось удалить товар');
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function setCategoryMessage(message, type = 'error') {
+  const element = document.querySelector('[data-catalog-category-message]');
+  if (!element) return;
+  element.textContent = message;
+  element.hidden = !message;
+  element.classList.toggle('admin-category-manager__message--success', type === 'success');
+}
+
+function resetCategoryForm() {
+  catalogAdminState.activeCategory = null;
+  const form = document.querySelector('[data-catalog-category-form]');
+  form?.reset();
+  document.querySelector('[data-catalog-category-order]').value = 0;
+  document.querySelector('[data-catalog-category-active]').checked = true;
+  document.querySelector('[data-catalog-category-form-title]').textContent = 'Новая категория';
+  document.querySelector('[data-catalog-category-delete]').hidden = true;
+  setCategoryMessage('');
+}
+
+function editCategory(category) {
+  catalogAdminState.activeCategory = category;
+  document.querySelector('[data-catalog-category-name]').value = category.name || '';
+  document.querySelector('[data-catalog-category-slug]').value = category.slug || '';
+  document.querySelector('[data-catalog-category-description]').value = category.description || '';
+  document.querySelector('[data-catalog-category-order]').value = category.sortOrder || 0;
+  document.querySelector('[data-catalog-category-active]').checked = category.isActive;
+  document.querySelector('[data-catalog-category-form-title]').textContent = `Редактирование: ${category.name}`;
+  document.querySelector('[data-catalog-category-delete]').hidden = false;
+  setCategoryMessage('');
+}
+
+function renderAdminCategoryList() {
+  const container = document.querySelector('[data-catalog-category-list]');
+  if (!container) return;
+  container.replaceChildren();
+
+  catalogAdminState.categories.forEach((category) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'admin-category-manager__item';
+    const name = document.createElement('strong');
+    name.textContent = category.name;
+    const detail = document.createElement('span');
+    detail.textContent = `${category.productsCount || 0} товаров · ${category.isActive ? 'опубликована' : 'скрыта'}`;
+    button.append(name, detail);
+    button.addEventListener('click', () => editCategory(category));
+    container.append(button);
+  });
+}
+
+function openCategoryModal() {
+  const modal = document.querySelector('[data-catalog-category-modal]');
+  resetCategoryForm();
+  renderAdminCategoryList();
+  if (modal) modal.hidden = false;
+  document.body.classList.add('admin-body--modal-open');
+}
+
+function closeCategoryModal() {
+  const modal = document.querySelector('[data-catalog-category-modal]');
+  if (modal) modal.hidden = true;
+  resetCategoryForm();
+  document.body.classList.remove('admin-body--modal-open');
+}
+
+async function saveAdminCategory(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    return;
+  }
+
+  const category = catalogAdminState.activeCategory;
+  const submit = document.querySelector('[data-catalog-category-save]');
+  submit.disabled = true;
+  setCategoryMessage('');
+
+  try {
+    const csrfToken = await getCsrfToken();
+    const payload = {
+      name: document.querySelector('[data-catalog-category-name]').value.trim(),
+      slug: document.querySelector('[data-catalog-category-slug]').value.trim(),
+      description: document.querySelector('[data-catalog-category-description]').value.trim(),
+      sortOrder: Number(document.querySelector('[data-catalog-category-order]').value || 0),
+      isActive: document.querySelector('[data-catalog-category-active]').checked,
+    };
+    const url = category ? `/admin/api/catalog/categories/${category.id}` : '/admin/api/catalog/categories';
+    const { response, data } = await requestJson(url, {
+      method: category ? 'PATCH' : 'POST',
+      headers: {
+        'X-CSRF-Token': csrfToken,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) throw new Error(data?.message || 'Не удалось сохранить категорию');
+    await loadAdminCatalog();
+    resetCategoryForm();
+    setCategoryMessage('Категория сохранена', 'success');
+  } catch (error) {
+    setCategoryMessage(error.message || 'Не удалось сохранить категорию');
+  } finally {
+    submit.disabled = false;
+  }
+}
+
+async function deleteAdminCategory() {
+  const category = catalogAdminState.activeCategory;
+  if (!category || !window.confirm(`Удалить категорию «${category.name}»? Товары останутся без категории.`)) return;
+
+  const button = document.querySelector('[data-catalog-category-delete]');
+  button.disabled = true;
+
+  try {
+    const csrfToken = await getCsrfToken();
+    const { response, data } = await requestJson(`/admin/api/catalog/categories/${category.id}`, {
+      method: 'DELETE',
+      headers: {
+        'X-CSRF-Token': csrfToken,
+      },
+    });
+    if (!response.ok) throw new Error(data?.message || 'Не удалось удалить категорию');
+    await loadAdminCatalog();
+    resetCategoryForm();
+    setCategoryMessage('Категория удалена', 'success');
+  } catch (error) {
+    setCategoryMessage(error.message || 'Не удалось удалить категорию');
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function initAdminCatalogControls() {
+  document.querySelector('[data-catalog-product-create]')?.addEventListener('click', () => openProductModal());
+  document.querySelectorAll('[data-catalog-product-close]').forEach((button) => button.addEventListener('click', closeProductModal));
+  document.querySelector('[data-catalog-product-form]')?.addEventListener('submit', saveAdminProduct);
+  document.querySelector('[data-catalog-product-delete]')?.addEventListener('click', deleteAdminProduct);
+  document.querySelector('[data-catalog-category-open]')?.addEventListener('click', openCategoryModal);
+  document.querySelectorAll('[data-catalog-category-close]').forEach((button) => button.addEventListener('click', closeCategoryModal));
+  document.querySelector('[data-catalog-category-form]')?.addEventListener('submit', saveAdminCategory);
+  document.querySelector('[data-catalog-category-reset]')?.addEventListener('click', resetCategoryForm);
+  document.querySelector('[data-catalog-category-delete]')?.addEventListener('click', deleteAdminCategory);
+
+  document.querySelector('[data-admin-catalog-grid]')?.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-catalog-product-edit]');
+    if (!button) return;
+    const product = catalogAdminState.products.find((item) => item.id === Number(button.dataset.catalogProductEdit));
+    if (product) openProductModal(product);
+  });
+
+  ['[data-admin-catalog-search]', '[data-admin-catalog-category-filter]', '[data-admin-catalog-status-filter]'].forEach((selector) => {
+    const element = document.querySelector(selector);
+    element?.addEventListener(element.matches('input') ? 'input' : 'change', renderAdminProducts);
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    if (!document.querySelector('[data-catalog-product-modal]')?.hidden) closeProductModal();
+    if (!document.querySelector('[data-catalog-category-modal]')?.hidden) closeCategoryModal();
+  });
+}
+
+async function initAdminCatalogPage() {
+  try {
+    const user = await getCurrentUser();
+    if (!user) return;
+    if (user.role !== 'OWNER') {
+      window.location.replace('/admin/requests');
+      return;
+    }
+    setUserData(user);
+    initLogout();
+    initAdminCatalogControls();
+    await loadAdminCatalog();
+  } catch (error) {
+    console.error('Catalog init error:', error);
+    setAdminCatalogMessage('Не удалось открыть каталог');
+    setAdminCatalogLoading(false);
+  }
+}
+
 if (adminPage === 'login') {
   initLoginPage();
 }
@@ -2349,4 +2894,8 @@ if (adminPage === 'requests') {
 
 if (adminPage === 'staff') {
   initStaffPage();
+}
+
+if (adminPage === 'catalog') {
+  initAdminCatalogPage();
 }

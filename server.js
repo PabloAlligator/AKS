@@ -6,10 +6,13 @@ import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import path from 'node:path';
+import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
 import authRoutes from './routes/auth.routes.js';
+import adminCatalogRoutes from './routes/admin-catalog.routes.js';
 import adminRoutes from './routes/admin.routes.js';
+import catalogRoutes from './routes/catalog.routes.js';
 import requireAuth from './middleware/require-auth.js';
 import requireRole from './middleware/require-role.js';
 import { buildLeadSearchText } from './utils/search.js';
@@ -35,7 +38,9 @@ app.use(express.urlencoded({ extended: false, limit: '20kb' }));
 app.use(cookieParser());
 
 app.use('/admin/api/auth', authRoutes);
+app.use('/admin/api/catalog', adminCatalogRoutes);
 app.use('/admin/api', adminRoutes);
+app.use('/api/catalog', catalogRoutes);
 
 function sendAdminPage(fileName) {
   return (req, res) => {
@@ -44,6 +49,15 @@ function sendAdminPage(fileName) {
 
     return res.sendFile(path.join(__dirname, 'admin-pages', fileName));
   };
+}
+
+function escapeHtml(value) {
+  return String(value || '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
 }
 
 // админка
@@ -65,6 +79,13 @@ app.get(
 );
 
 app.get('/admin/requests', requireAuth.page, sendAdminPage('requests.html'));
+
+app.get(
+  '/admin/catalog',
+  requireAuth.page,
+  requireRole.page('OWNER'),
+  sendAdminPage('catalog.html'),
+);
 
 app.get(
   '/admin/staff',
@@ -103,6 +124,72 @@ app.get('/udalenie-katalizatora.html', (req, res) => {
   return res.sendFile(
     path.join(__dirname, 'site', 'udalenie-katalizatora.html'),
   );
+});
+
+app.get('/catalog.html', (req, res) => {
+  return res.redirect(301, '/catalog');
+});
+
+app.get('/catalog', (req, res) => {
+  return res.sendFile(path.join(__dirname, 'site', 'catalog.html'));
+});
+
+app.get('/site/catalog.html', (req, res) => {
+  return res.redirect(301, '/catalog');
+});
+
+app.get('/site/product.html', (req, res) => {
+  return res.redirect(301, '/catalog');
+});
+
+app.get('/catalog/:slug', async (req, res, next) => {
+  try {
+    const slug = String(req.params.slug || '').trim().toLowerCase();
+    const product = await prisma.product.findFirst({
+      where: {
+        slug,
+        isActive: true,
+        OR: [
+          {
+            categoryId: null,
+          },
+          {
+            category: {
+              is: {
+                isActive: true,
+              },
+            },
+          },
+        ],
+      },
+      select: {
+        name: true,
+        shortDescription: true,
+      },
+    });
+
+    if (!product) {
+      return res.status(404).sendFile(path.join(__dirname, '404.html'));
+    }
+
+    const template = await readFile(
+      path.join(__dirname, 'site', 'product.html'),
+      'utf8',
+    );
+    const title = `${product.name} — каталог Автокат Сервис`;
+    const description =
+      product.shortDescription ||
+      `${product.name}. Оставьте заявку — менеджер AutoCat уточнит совместимость и подтвердит заказ.`;
+    const canonical = `https://autocat-abakan.ru/catalog/${encodeURIComponent(slug)}`;
+    const html = template
+      .replaceAll('{{PRODUCT_TITLE}}', escapeHtml(title))
+      .replaceAll('{{PRODUCT_DESCRIPTION}}', escapeHtml(description))
+      .replaceAll('{{PRODUCT_CANONICAL}}', escapeHtml(canonical));
+
+    return res.type('html').send(html);
+  } catch (error) {
+    return next(error);
+  }
 });
 
 app.use(
