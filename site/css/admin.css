@@ -2426,27 +2426,38 @@ a {
   height: 100%;
   object-fit: contain;
 }
-.admin-catalog-modal__image button {
+.admin-catalog-modal__image-remove {
   position: absolute;
+  top: 6px;
   right: 6px;
-  bottom: 6px;
-  padding: 5px 7px;
-  border-radius: 5px;
+  z-index: 2;
+  display: grid;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 50%;
   color: #fff;
-  background: rgba(0, 0, 0, 0.82);
+  background: rgba(0, 0, 0, 0.78);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
   cursor: pointer;
-  font-size: 10px;
+  font-size: 21px;
+  font-weight: 400;
+  line-height: 1;
+  place-items: center;
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+.admin-catalog-modal__image-remove:hover {
+  background: #d40000;
+  transform: scale(1.08);
+}
+.admin-catalog-modal__image-remove:active {
+  transform: scale(0.94);
 }
 .admin-catalog-modal__image--removed {
-  opacity: 0.42;
-}
-.admin-catalog-modal__image--removed::after {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: rgba(212, 0, 0, 0.18);
-  content: "";
-  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.92);
+  transition: opacity 160ms ease, transform 160ms ease;
 }
 .admin-catalog-modal__message {
   padding: 12px 14px;

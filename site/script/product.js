@@ -14,55 +14,144 @@ function setProductState(message, type = 'loading') {
 function renderProductGallery(product) {
   const main = document.querySelector('[data-product-main-image]');
   const thumbnails = document.querySelector('[data-product-thumbnails]');
-  const images = product.images || [];
+  const images = (product.images || []).filter((image) => image?.path);
 
   if (!main || !thumbnails) return;
 
+  main.replaceChildren();
   thumbnails.replaceChildren();
+  thumbnails.hidden = true;
+  main.removeAttribute('tabindex');
+  main.removeAttribute('aria-label');
+  main.removeAttribute('aria-roledescription');
 
-  function setMainImage(image) {
-    main.replaceChildren();
-
-    if (!image) {
-      const placeholder = document.createElement('span');
-      placeholder.className = 'product-gallery__placeholder';
-      placeholder.textContent = 'AC';
-      main.append(placeholder);
-      return;
-    }
-
-    const img = document.createElement('img');
-    img.src = image.path;
-    img.alt = image.alt || product.name;
-    main.append(img);
-  }
-
-  setMainImage(images[0]);
-
-  if (images.length <= 1) {
-    thumbnails.hidden = true;
+  if (!images.length) {
+    const placeholder = document.createElement('span');
+    placeholder.className = 'product-gallery__placeholder';
+    placeholder.textContent = 'AC';
+    main.append(placeholder);
     return;
   }
+
+  let activeIndex = 0;
+
+  function createMainImage(image, index) {
+    const img = document.createElement('img');
+    img.className = 'product-gallery__image';
+    img.src = image.path;
+    img.alt = image.alt || `${product.name}, фото ${index + 1}`;
+    img.draggable = false;
+    return img;
+  }
+
+  function updateThumbnails() {
+    thumbnails.querySelectorAll('.product-gallery__thumb').forEach((button, index) => {
+      const isActive = index === activeIndex;
+      button.classList.toggle('product-gallery__thumb--active', isActive);
+      button.setAttribute('aria-current', isActive ? 'true' : 'false');
+    });
+  }
+
+  function showImage(index) {
+    activeIndex = (index + images.length) % images.length;
+    const nextImage = createMainImage(images[activeIndex], activeIndex);
+    const currentImage = main.querySelector('.product-gallery__image');
+
+    if (currentImage) {
+      currentImage.replaceWith(nextImage);
+    } else {
+      main.prepend(nextImage);
+    }
+
+    main.setAttribute(
+      'aria-label',
+      `${product.name}: фото ${activeIndex + 1} из ${images.length}`,
+    );
+    updateThumbnails();
+  }
+
+  main.append(createMainImage(images[0], 0));
+
+  if (images.length === 1) return;
+
+  main.tabIndex = 0;
+  main.setAttribute('aria-roledescription', 'carousel');
+  main.setAttribute('aria-label', `${product.name}: фото 1 из ${images.length}`);
+
+  const previousButton = document.createElement('button');
+  previousButton.type = 'button';
+  previousButton.className = 'product-gallery__arrow product-gallery__arrow--prev';
+  previousButton.setAttribute('aria-label', 'Предыдущее фото');
+  previousButton.textContent = '‹';
+  previousButton.addEventListener('click', () => showImage(activeIndex - 1));
+
+  const nextButton = document.createElement('button');
+  nextButton.type = 'button';
+  nextButton.className = 'product-gallery__arrow product-gallery__arrow--next';
+  nextButton.setAttribute('aria-label', 'Следующее фото');
+  nextButton.textContent = '›';
+  nextButton.addEventListener('click', () => showImage(activeIndex + 1));
+
+  main.append(previousButton, nextButton);
 
   thumbnails.hidden = false;
   images.forEach((image, index) => {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'product-gallery__thumb';
-    button.classList.toggle('product-gallery__thumb--active', index === 0);
+    button.setAttribute('aria-label', `Показать фото ${index + 1}`);
+
     const img = document.createElement('img');
     img.src = image.path;
     img.alt = image.alt || `${product.name}, фото ${index + 1}`;
+    img.loading = 'lazy';
+    img.draggable = false;
+
     button.append(img);
-    button.addEventListener('click', () => {
-      thumbnails.querySelectorAll('button').forEach((item) => {
-        item.classList.remove('product-gallery__thumb--active');
-      });
-      button.classList.add('product-gallery__thumb--active');
-      setMainImage(image);
-    });
+    button.addEventListener('click', () => showImage(index));
     thumbnails.append(button);
   });
+
+  updateThumbnails();
+
+  main.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      showImage(activeIndex - 1);
+    } else if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      showImage(activeIndex + 1);
+    }
+  });
+
+  let touchStartX = 0;
+  let touchStartY = 0;
+
+  main.addEventListener(
+    'touchstart',
+    (event) => {
+      if (event.touches.length !== 1) return;
+      touchStartX = event.touches[0].clientX;
+      touchStartY = event.touches[0].clientY;
+    },
+    { passive: true },
+  );
+
+  main.addEventListener(
+    'touchend',
+    (event) => {
+      if (!event.changedTouches.length) return;
+
+      const deltaX = event.changedTouches[0].clientX - touchStartX;
+      const deltaY = event.changedTouches[0].clientY - touchStartY;
+      const isHorizontalSwipe =
+        Math.abs(deltaX) >= 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.15;
+
+      if (!isHorizontalSwipe) return;
+      showImage(activeIndex + (deltaX < 0 ? 1 : -1));
+    },
+    { passive: true },
+  );
 }
 
 function renderSpecifications(value) {

@@ -2571,19 +2571,21 @@ function renderExistingProductImages(product) {
     img.alt = image.alt || product.name;
     const button = document.createElement('button');
     button.type = 'button';
-    button.textContent = 'Удалить';
+    button.className = 'admin-catalog-modal__image-remove';
+    button.textContent = '×';
+    button.title = 'Удалить фотографию';
+    button.setAttribute('aria-label', `Удалить фотографию ${image.alt || product.name}`);
     button.addEventListener('click', () => {
-      const isRemoved = catalogAdminState.removeImageIds.has(image.id);
+      catalogAdminState.removeImageIds.add(image.id);
+      item.classList.add('admin-catalog-modal__image--removed');
 
-      if (isRemoved) {
-        catalogAdminState.removeImageIds.delete(image.id);
-        item.classList.remove('admin-catalog-modal__image--removed');
-        button.textContent = 'Удалить';
-      } else {
-        catalogAdminState.removeImageIds.add(image.id);
-        item.classList.add('admin-catalog-modal__image--removed');
-        button.textContent = 'Вернуть';
-      }
+      window.setTimeout(() => {
+        item.remove();
+
+        if (!container.children.length) {
+          container.hidden = true;
+        }
+      }, 160);
     });
     item.append(img, button);
     container.append(item);

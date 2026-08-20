@@ -7,6 +7,11 @@ $muted: #8d8e93;
 $red: #ef241f;
 $red-dark: #b40c09;
 $catalog-max: 1720px;
+$catalog-light-bg: #e7e8ea;
+$catalog-light-surface: #f7f7f8;
+$catalog-light-border: rgba(15, 16, 18, 0.13);
+$catalog-light-text: #17181a;
+$catalog-light-muted: #686a70;
 
 * {
   box-sizing: border-box;
@@ -180,7 +185,8 @@ select {
 
 .catalog-products {
   padding: 24px 36px 34px;
-  background: $bg;
+  color: $catalog-light-text;
+  background: $catalog-light-bg;
 
   &__inner {
     width: min($catalog-max, 100%);
@@ -212,7 +218,7 @@ select {
 
 .catalog-sort {
   display: flex;
-  color: #8f9095;
+  color: $catalog-light-muted;
   align-items: center;
   gap: 10px;
   font-size: 13px;
@@ -220,11 +226,11 @@ select {
   select {
     min-height: 40px;
     padding: 0 34px 0 13px;
-    border: 1px solid $border;
+    border: 1px solid $catalog-light-border;
     border-radius: 4px;
     outline: 0;
-    color: #d2d2d5;
-    background: $surface-soft;
+    color: $catalog-light-text;
+    background: $catalog-light-surface;
     cursor: pointer;
     font-size: 13px;
   }
@@ -233,16 +239,17 @@ select {
 .catalog-sidebar {
   align-self: start;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid $catalog-light-border;
   border-radius: 8px;
-  background: $surface;
+  background: $catalog-light-surface;
+  box-shadow: 0 12px 34px rgba(20, 21, 24, 0.05);
 
   &__group {
     min-width: 0;
     margin: 0;
     padding: 18px 18px 17px;
     border: 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    border-bottom: 1px solid $catalog-light-border;
 
     > label,
     legend {
@@ -250,7 +257,7 @@ select {
       width: 100%;
       margin: 0 0 11px;
       padding: 0;
-      color: #d5d5d8;
+      color: #303136;
       font-size: 14px;
       font-weight: 800;
     }
@@ -259,11 +266,11 @@ select {
       width: 100%;
       min-height: 44px;
       padding: 0 13px;
-      border: 1px solid rgba(255, 255, 255, 0.11);
+      border: 1px solid $catalog-light-border;
       border-radius: 4px;
       outline: 0;
-      color: #a7a8ad;
-      background: #18191c;
+      color: #494b50;
+      background: #fff;
       font-size: 13px;
     }
   }
@@ -278,11 +285,11 @@ select {
       min-width: 0;
       height: 42px;
       padding: 0 10px;
-      border: 1px solid rgba(255, 255, 255, 0.11);
+      border: 1px solid $catalog-light-border;
       border-radius: 4px;
-      color: #77787d;
+      color: #8a8c91;
       align-items: center;
-      background: #18191c;
+      background: #fff;
       gap: 5px;
       font-size: 12px;
     }
@@ -293,7 +300,7 @@ select {
       padding: 0;
       border: 0;
       outline: 0;
-      color: #b8b8bc;
+      color: #44464b;
       background: transparent;
       font-size: 12px;
       -moz-appearance: textfield;
@@ -308,17 +315,17 @@ select {
 
   &__manager {
     padding: 19px 18px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-    // background: linear-gradient(135deg, rgba($red, 0.09), transparent 72%);
+    border-bottom: 1px solid $catalog-light-border;
+    background: rgba($red, 0.025);
 
     strong {
-      color: #f0f0f1;
+      color: #292a2e;
       font-size: 14px;
     }
 
     p {
       margin: 9px 0 0;
-      color: #909197;
+      color: $catalog-light-muted;
       font-size: 12px;
       line-height: 1.55;
     }
@@ -349,10 +356,10 @@ select {
 .catalog-status,
 .product-status {
   padding: 54px 24px;
-  border: 1px solid $border;
+  border: 1px solid $catalog-light-border;
   border-radius: 8px;
-  color: $muted;
-  background: $surface;
+  color: $catalog-light-muted;
+  background: $catalog-light-surface;
   text-align: center;
 
   &[data-state='error'] {
@@ -371,9 +378,10 @@ select {
   display: flex;
   min-width: 0;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid $catalog-light-border;
   border-radius: 8px;
-  background: #151618;
+  background: $catalog-light-surface;
+  box-shadow: 0 12px 30px rgba(20, 21, 24, 0.045);
   flex-direction: column;
   transition: border-color 180ms ease, transform 180ms ease;
 
@@ -446,7 +454,7 @@ select {
     -webkit-line-clamp: 2;
 
     a {
-      color: #f3f3f4;
+      color: $catalog-light-text;
       text-decoration: none;
     }
   }
@@ -454,7 +462,7 @@ select {
   &__detail {
     overflow: hidden;
     margin: 8px 0 0;
-    color: #818288;
+    color: $catalog-light-muted;
     font-size: 12px;
     line-height: 1.4;
     text-overflow: ellipsis;
@@ -471,7 +479,7 @@ select {
 
   &__price {
     margin-right: auto;
-    color: #f5f5f5;
+    color: $catalog-light-text;
     font-size: 23px;
     line-height: 1;
     white-space: nowrap;
@@ -492,13 +500,13 @@ select {
   }
 
   &__more {
-    border: 1px solid rgba(255, 255, 255, 0.19);
-    color: #bfc0c4;
+    border: 1px solid rgba(23, 24, 26, 0.18);
+    color: #55575d;
     background: transparent;
 
     &:hover {
-      border-color: rgba(255, 255, 255, 0.36);
-      color: #fff;
+      border-color: rgba(23, 24, 26, 0.35);
+      color: #17181a;
     }
   }
 
@@ -516,9 +524,10 @@ select {
 
 .catalog-empty {
   padding: 60px 24px;
-  border: 1px solid $border;
+  border: 1px solid $catalog-light-border;
   border-radius: 8px;
-  background: $surface;
+  color: $catalog-light-text;
+  background: $catalog-light-surface;
   text-align: center;
 
   span {
@@ -528,7 +537,7 @@ select {
 
   p {
     margin: 12px 0;
-    color: $muted;
+    color: $catalog-light-muted;
   }
 
   a {
@@ -549,10 +558,10 @@ select {
   button {
     min-height: 44px;
     padding: 0 20px;
-    border: 1px solid $border;
+    border: 1px solid $catalog-light-border;
     border-radius: 4px;
-    color: #fff;
-    background: $surface;
+    color: $catalog-light-text;
+    background: $catalog-light-surface;
     cursor: pointer;
 
     &:disabled {
@@ -564,7 +573,7 @@ select {
 
 .catalog-benefits {
   padding: 8px 36px 50px;
-  background: $bg;
+  background: $catalog-light-bg;
 
   &__inner {
     display: grid;
@@ -575,7 +584,7 @@ select {
 
     div {
       display: flex;
-      color: #a7a8ad;
+      color: #5f6166;
       align-items: center;
       justify-content: center;
       gap: 13px;
@@ -593,7 +602,7 @@ select {
 
 .catalog-service {
   padding: 40px 36px 100px;
-  background: $bg;
+  background: $catalog-light-bg;
 
   &__inner {
     width: min($catalog-max, 100%);
@@ -853,10 +862,10 @@ select {
   padding: 0 14px;
   border: 1px solid rgba($red, 0.42);
   border-radius: 8px;
-  color: #fff;
+  color: $red-dark;
   align-items: center;
   justify-content: center;
-  background: rgba($red, 0.12);
+  background: rgba($red, 0.08);
   font-size: 12px;
   font-weight: 800;
   text-decoration: none;
@@ -911,7 +920,7 @@ select {
   z-index: 900;
   display: flex;
   min-height: 52px;
-  padding: 0 10px 0 20px;
+  padding: 0 20px;
   border: 1px solid rgba($red, 0.75);
   border-radius: 8px;
   color: #fff;
@@ -1093,9 +1102,10 @@ select {
 .product-main {
   min-height: 80vh;
   padding: 136px 36px 110px;
+  color: $catalog-light-text;
   background:
-    radial-gradient(circle at 74% 5%, rgba($red, 0.055), transparent 24%),
-    $bg;
+    radial-gradient(circle at 74% 5%, rgba($red, 0.045), transparent 24%),
+    $catalog-light-bg;
 }
 
 .product-status,
@@ -1107,13 +1117,13 @@ select {
 .product-breadcrumbs {
   display: flex;
   margin-bottom: 34px;
-  color: #77777c;
+  color: #76787d;
   flex-wrap: wrap;
   gap: 9px;
   font-size: 13px;
 
   a {
-    color: #aaaab0;
+    color: #55575c;
     text-decoration: none;
   }
 }
@@ -1129,6 +1139,7 @@ select {
   min-width: 0;
 
   &__main {
+    position: relative;
     display: flex;
     aspect-ratio: 1.22 / 1;
     padding: 0;
@@ -1136,6 +1147,8 @@ select {
     overflow: hidden;
     align-items: center;
     justify-content: center;
+    touch-action: pan-y;
+    user-select: none;
     background:
       radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.96), transparent 48%),
       linear-gradient(145deg, #d4d4d6, #f1f1f2 55%, #c9c9cc);
@@ -1144,6 +1157,8 @@ select {
       width: 100%;
       height: 100%;
       object-fit: contain;
+      pointer-events: none;
+      user-select: none;
       filter: drop-shadow(0 24px 22px rgba(0, 0, 0, 0.12));
     }
   }
@@ -1161,6 +1176,48 @@ select {
     font-size: 54px;
   }
 
+  &__arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 3;
+    display: flex;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.34);
+    border-radius: 50%;
+    color: #fff;
+    align-items: center;
+    justify-content: center;
+    background: rgba(17, 18, 20, 0.72);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+    cursor: pointer;
+    font-size: 27px;
+    line-height: 1;
+    transform: translateY(-50%);
+    backdrop-filter: blur(8px);
+    transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+
+    &:hover {
+      border-color: $red;
+      background: $red;
+      transform: translateY(-50%) scale(1.04);
+    }
+
+    &:focus-visible {
+      outline: 3px solid rgba($red, 0.28);
+      outline-offset: 3px;
+    }
+
+    &--prev {
+      left: 16px;
+    }
+
+    &--next {
+      right: 16px;
+    }
+  }
+
   &__thumbs {
     display: flex;
     margin-top: 14px;
@@ -1173,7 +1230,7 @@ select {
     width: 86px;
     height: 74px;
     padding: 7px;
-    border: 1px solid $border;
+    border: 1px solid $catalog-light-border;
     border-radius: 8px;
     flex: 0 0 auto;
     align-items: center;
@@ -1224,7 +1281,7 @@ select {
 
   &__summary {
     margin: 0;
-    color: #94959a;
+    color: $catalog-light-muted;
     font-size: 17px;
     line-height: 1.58;
   }
@@ -1241,19 +1298,19 @@ select {
       + div {
         margin-left: 30px;
         padding-left: 30px;
-        border-left: 1px solid rgba(255, 255, 255, 0.24);
+        border-left: 1px solid rgba(23, 24, 26, 0.18);
       }
     }
 
     dt {
-      color: #77787d;
+      color: #77797e;
       font-size: 13px;
     }
 
     dd {
       margin: 9px 0 0;
       overflow: hidden;
-      color: #fff;
+      color: $catalog-light-text;
       font-size: 15px;
       text-overflow: ellipsis;
     }
@@ -1293,7 +1350,7 @@ select {
     margin: 18px 0 0;
     padding-left: 14px;
     border-left: 2px solid rgba($red, 0.75);
-    color: #929399;
+    color: #65676c;
     font-size: 13px;
     line-height: 1.55;
   }
@@ -1302,7 +1359,7 @@ select {
 .product-details {
   display: grid;
   margin-top: 54px;
-  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  border-top: 1px solid rgba(23, 24, 26, 0.16);
   grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
 
   &__section {
@@ -1312,7 +1369,7 @@ select {
     + .product-details__section {
       padding-right: 0;
       padding-left: 64px;
-      border-left: 1px solid rgba(255, 255, 255, 0.16);
+      border-left: 1px solid rgba(23, 24, 26, 0.16);
     }
 
     h2 {
@@ -1326,7 +1383,7 @@ select {
     > p {
       margin: 0;
       max-width: 590px;
-      color: #a0a1a6;
+      color: #66686d;
       font-size: 15px;
       line-height: 1.8;
       white-space: pre-line;
@@ -1339,7 +1396,7 @@ select {
     div {
       display: grid;
       padding: 14px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.13);
+      border-bottom: 1px solid rgba(23, 24, 26, 0.12);
       grid-template-columns: minmax(130px, 0.8fr) minmax(0, 1.2fr);
       gap: 20px;
 
@@ -1349,13 +1406,13 @@ select {
     }
 
     dt {
-      color: #87888d;
+      color: #77797e;
       font-size: 14px;
     }
 
     dd {
       margin: 0;
-      color: #d8d8db;
+      color: #2f3034;
       font-size: 14px;
       text-align: right;
     }
@@ -1420,7 +1477,7 @@ select {
     grid-template-columns: repeat(2, minmax(0, 1fr));
 
     &__manager {
-      border-right: 1px solid rgba(255, 255, 255, 0.07);
+      border-right: 1px solid $catalog-light-border;
     }
   }
 
@@ -1451,7 +1508,7 @@ select {
 
       + .product-details__section {
         padding-left: 0;
-        border-top: 1px solid rgba(255, 255, 255, 0.16);
+        border-top: 1px solid rgba(23, 24, 26, 0.16);
         border-left: 0;
       }
     }
@@ -1460,6 +1517,17 @@ select {
   .cart-main { width: calc(100% - 40px); }
   .cart-layout { grid-template-columns: 1fr; }
   .cart-summary { position: static; }
+}
+
+@media (max-width: 760px) {
+  .product-gallery__arrow,
+  .product-gallery__thumbs {
+    display: none !important;
+  }
+
+  .product-gallery__main {
+    cursor: grab;
+  }
 }
 
 @media (max-width: 640px) {
