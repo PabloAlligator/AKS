@@ -1448,12 +1448,25 @@ select {
   }
 }
 @media (max-width: 760px) {
-  .product-gallery__arrow,
-  .product-gallery__thumbs {
+  .product-gallery__arrow {
     display: none !important;
   }
   .product-gallery__main {
     cursor: grab;
+  }
+  .product-gallery__thumbs {
+    margin-top: 10px;
+    gap: 8px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .product-gallery__thumbs::-webkit-scrollbar {
+    display: none;
+  }
+  .product-gallery__thumb {
+    width: 72px;
+    height: 62px;
+    padding: 5px;
   }
 }
 @media (max-width: 640px) {
@@ -1493,10 +1506,69 @@ select {
     grid-template-columns: 1fr;
   }
   .catalog-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
   }
   .catalog-card__image {
-    aspect-ratio: 1.65/1;
+    aspect-ratio: 1/1;
+    padding: 8px;
+  }
+  .catalog-card__placeholder {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    font-size: 20px;
+  }
+  .catalog-card__body {
+    min-height: 0;
+    padding: 10px 9px;
+  }
+  .catalog-card__category {
+    font-size: 9px;
+  }
+  .catalog-card__title {
+    margin-top: 5px;
+    font-size: 13px;
+    line-height: 1.25;
+  }
+  .catalog-card__detail {
+    display: none;
+  }
+  .catalog-card__bottom {
+    padding-top: 10px;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .catalog-card__price {
+    margin-right: 0;
+    font-size: 17px;
+    line-height: 1.12;
+    white-space: normal;
+  }
+  .catalog-card__more {
+    width: 100%;
+    min-height: 34px;
+    padding: 0 6px;
+    font-size: 10px;
+  }
+  .catalog-card__cart-control {
+    margin-top: 7px;
+    grid-template-columns: 1fr;
+  }
+  .catalog-card__cart-control .catalog-card__request,
+  .catalog-card__in-cart,
+  .catalog-card__counter {
+    min-height: 38px;
+  }
+  .catalog-card__in-cart {
+    width: 100%;
+    padding: 0 7px;
+    font-size: 10px;
+  }
+  .catalog-card__counter {
+    width: 100%;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .catalog-benefits {
     padding: 0 14px 24px;

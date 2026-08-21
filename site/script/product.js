@@ -45,11 +45,25 @@ function renderProductGallery(product) {
   }
 
   function updateThumbnails() {
+    let activeButton = null;
+
     thumbnails.querySelectorAll('.product-gallery__thumb').forEach((button, index) => {
       const isActive = index === activeIndex;
       button.classList.toggle('product-gallery__thumb--active', isActive);
       button.setAttribute('aria-current', isActive ? 'true' : 'false');
+
+      if (isActive) activeButton = button;
     });
+
+    if (activeButton && window.matchMedia('(max-width: 760px)').matches) {
+      const targetLeft =
+        activeButton.offsetLeft - (thumbnails.clientWidth - activeButton.offsetWidth) / 2;
+
+      thumbnails.scrollTo({
+        left: Math.max(0, targetLeft),
+        behavior: 'smooth',
+      });
+    }
   }
 
   function showImage(index) {

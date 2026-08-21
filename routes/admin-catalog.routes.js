@@ -43,6 +43,7 @@ const upload = multer({
 });
 
 const productIdSchema = z.coerce.number().int().positive();
+const productImageIdSchema = z.coerce.number().int().positive();
 const categoryIdSchema = z.coerce.number().int().positive();
 
 const productDataSchema = z.object({
@@ -597,6 +598,48 @@ router.patch(
       return res.json({ product });
     } catch (error) {
       cleanupUploadedFiles(req.files);
+      return next(error);
+    }
+  },
+);
+
+router.delete(
+  '/products/:id/images/:imageId',
+  validateOrigin,
+  requireCsrf,
+  async (req, res, next) => {
+    try {
+      const parsedProductId = productIdSchema.safeParse(req.params.id);
+      const parsedImageId = productImageIdSchema.safeParse(req.params.imageId);
+
+      if (!parsedProductId.success || !parsedImageId.success) {
+        return res.status(400).json({ message: 'Некорректная фотография' });
+      }
+
+      const image = await prisma.productImage.findFirst({
+        where: {
+          id: parsedImageId.data,
+          productId: parsedProductId.data,
+        },
+      });
+
+      if (!image) {
+        return res.status(404).json({ message: 'Фотография не найдена' });
+      }
+
+      await prisma.productImage.delete({
+        where: {
+          id: image.id,
+        },
+      });
+
+      removeStoredPath(image.path);
+
+      return res.json({
+        success: true,
+        imageId: image.id,
+      });
+    } catch (error) {
       return next(error);
     }
   },

@@ -2356,12 +2356,16 @@ async function initStaffPage() {
 
 /* CATALOG */
 
+const MAX_PRODUCT_IMAGES = 6;
+const MAX_PRODUCT_IMAGE_SIZE = 6 * 1024 * 1024;
+const ALLOWED_PRODUCT_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
 const catalogAdminState = {
   products: [],
   categories: [],
   activeProduct: null,
   activeCategory: null,
-  removeImageIds: new Set(),
+  pendingImages: [],
 };
 
 function setAdminCatalogMessage(message, type = 'error') {
@@ -2555,41 +2559,156 @@ function setProductModalMessage(message, type = 'error') {
   element.classList.toggle('admin-catalog-modal__message--success', type === 'success');
 }
 
-function renderExistingProductImages(product) {
+function clearPendingProductImages() {
+  catalogAdminState.pendingImages.forEach((item) => URL.revokeObjectURL(item.url));
+  catalogAdminState.pendingImages = [];
+}
+
+function getProductImageCount(product = catalogAdminState.activeProduct) {
+  return (product?.images?.length || 0) + catalogAdminState.pendingImages.length;
+}
+
+function renderProductImages(product = catalogAdminState.activeProduct) {
   const container = document.querySelector('[data-catalog-product-existing-images]');
   if (!container) return;
 
   container.replaceChildren();
   const images = product?.images || [];
-  container.hidden = images.length === 0;
+  const pendingImages = catalogAdminState.pendingImages;
+  container.hidden = images.length === 0 && pendingImages.length === 0;
 
   images.forEach((image) => {
     const item = document.createElement('div');
     item.className = 'admin-catalog-modal__image';
+
     const img = document.createElement('img');
     img.src = image.path;
     img.alt = image.alt || product.name;
+
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'admin-catalog-modal__image-remove';
     button.textContent = '×';
     button.title = 'Удалить фотографию';
     button.setAttribute('aria-label', `Удалить фотографию ${image.alt || product.name}`);
-    button.addEventListener('click', () => {
-      catalogAdminState.removeImageIds.add(image.id);
-      item.classList.add('admin-catalog-modal__image--removed');
 
-      window.setTimeout(() => {
-        item.remove();
+    button.addEventListener('click', async () => {
+      if (button.disabled) return;
 
-        if (!container.children.length) {
-          container.hidden = true;
+      button.disabled = true;
+      item.classList.add('admin-catalog-modal__image--deleting');
+      setProductModalMessage('');
+
+      try {
+        const csrfToken = await getCsrfToken();
+        if (!csrfToken) return;
+
+        const { response, data } = await requestJson(
+          `/admin/api/catalog/products/${product.id}/images/${image.id}`,
+          {
+            method: 'DELETE',
+            headers: {
+              'X-CSRF-Token': csrfToken,
+            },
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error(data?.message || 'Не удалось удалить фотографию');
         }
-      }, 160);
+
+        product.images = (product.images || []).filter((itemImage) => itemImage.id !== image.id);
+
+        const storedProduct = catalogAdminState.products.find((itemProduct) => itemProduct.id === product.id);
+        if (storedProduct && storedProduct !== product) {
+          storedProduct.images = (storedProduct.images || []).filter(
+            (itemImage) => itemImage.id !== image.id,
+          );
+        }
+
+        renderAdminProducts();
+        renderProductImages(product);
+      } catch (error) {
+        item.classList.remove('admin-catalog-modal__image--deleting');
+        button.disabled = false;
+        setProductModalMessage(error.message || 'Не удалось удалить фотографию');
+      }
     });
+
     item.append(img, button);
     container.append(item);
   });
+
+  pendingImages.forEach((pendingImage) => {
+    const item = document.createElement('div');
+    item.className = 'admin-catalog-modal__image admin-catalog-modal__image--pending';
+
+    const img = document.createElement('img');
+    img.src = pendingImage.url;
+    img.alt = pendingImage.file.name || 'Новая фотография товара';
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'admin-catalog-modal__image-remove';
+    button.textContent = '×';
+    button.title = 'Убрать фотографию';
+    button.setAttribute('aria-label', `Убрать фотографию ${pendingImage.file.name}`);
+    button.addEventListener('click', () => {
+      URL.revokeObjectURL(pendingImage.url);
+      catalogAdminState.pendingImages = catalogAdminState.pendingImages.filter(
+        (itemImage) => itemImage.id !== pendingImage.id,
+      );
+      renderProductImages(product);
+    });
+
+    item.append(img, button);
+    container.append(item);
+  });
+}
+
+function addPendingProductImages(fileList) {
+  const files = [...(fileList || [])];
+  const input = document.querySelector('[data-catalog-product-images]');
+
+  if (input) input.value = '';
+  if (!files.length) return;
+
+  const invalidType = files.find((file) => !ALLOWED_PRODUCT_IMAGE_TYPES.has(file.type));
+  if (invalidType) {
+    setProductModalMessage('Можно загружать только JPG, PNG или WEBP');
+    return;
+  }
+
+  const oversized = files.find((file) => file.size > MAX_PRODUCT_IMAGE_SIZE);
+  if (oversized) {
+    setProductModalMessage('Одна из фотографий больше 6 МБ');
+    return;
+  }
+
+  const uniqueFiles = files.filter((file) => {
+    return !catalogAdminState.pendingImages.some(
+      (item) =>
+        item.file.name === file.name &&
+        item.file.size === file.size &&
+        item.file.lastModified === file.lastModified,
+    );
+  });
+
+  if (getProductImageCount() + uniqueFiles.length > MAX_PRODUCT_IMAGES) {
+    setProductModalMessage('У товара может быть не больше 6 фотографий');
+    return;
+  }
+
+  uniqueFiles.forEach((file) => {
+    catalogAdminState.pendingImages.push({
+      id: `${file.name}-${file.size}-${file.lastModified}-${window.crypto?.randomUUID?.() || Math.random().toString(36).slice(2)}`,
+      file,
+      url: URL.createObjectURL(file),
+    });
+  });
+
+  setProductModalMessage('');
+  renderProductImages();
 }
 
 function openProductModal(product = null) {
@@ -2598,7 +2717,7 @@ function openProductModal(product = null) {
   if (!modal || !form) return;
 
   catalogAdminState.activeProduct = product;
-  catalogAdminState.removeImageIds.clear();
+  clearPendingProductImages();
   form.reset();
   document.querySelector('[data-catalog-product-active]').checked = product?.isActive ?? true;
   document.querySelector('[data-catalog-product-price-from]').checked = product?.priceFrom ?? false;
@@ -2615,7 +2734,7 @@ function openProductModal(product = null) {
   document.querySelector('[data-catalog-product-caption]').textContent = product ? 'Редактирование товара' : 'Новый товар';
   document.querySelector('[data-catalog-product-title]').textContent = product ? product.name : 'Добавить товар';
   document.querySelector('[data-catalog-product-delete]').hidden = !product;
-  renderExistingProductImages(product);
+  renderProductImages(product);
   setProductModalMessage('');
   modal.hidden = false;
   document.body.classList.add('admin-body--modal-open');
@@ -2625,7 +2744,7 @@ function closeProductModal() {
   const modal = document.querySelector('[data-catalog-product-modal]');
   if (modal) modal.hidden = true;
   catalogAdminState.activeProduct = null;
-  catalogAdminState.removeImageIds.clear();
+  clearPendingProductImages();
   document.body.classList.remove('admin-body--modal-open');
 }
 
@@ -2647,9 +2766,12 @@ async function saveAdminProduct(event) {
     const csrfToken = await getCsrfToken();
     if (!csrfToken) return;
     const formData = new FormData(form);
+    formData.delete('images');
+    catalogAdminState.pendingImages.forEach(({ file }) => {
+      formData.append('images', file, file.name);
+    });
     formData.set('priceFrom', String(document.querySelector('[data-catalog-product-price-from]').checked));
     formData.set('isActive', String(document.querySelector('[data-catalog-product-active]').checked));
-    formData.set('removeImageIds', JSON.stringify([...catalogAdminState.removeImageIds]));
     const url = product ? `/admin/api/catalog/products/${product.id}` : '/admin/api/catalog/products';
     const { response, data } = await requestFormData(url, formData, {
       method: product ? 'PATCH' : 'POST',
@@ -2837,6 +2959,9 @@ function initAdminCatalogControls() {
   document.querySelector('[data-catalog-product-create]')?.addEventListener('click', () => openProductModal());
   document.querySelectorAll('[data-catalog-product-close]').forEach((button) => button.addEventListener('click', closeProductModal));
   document.querySelector('[data-catalog-product-form]')?.addEventListener('submit', saveAdminProduct);
+  document.querySelector('[data-catalog-product-images]')?.addEventListener('change', (event) => {
+    addPendingProductImages(event.target.files);
+  });
   document.querySelector('[data-catalog-product-delete]')?.addEventListener('click', deleteAdminProduct);
   document.querySelector('[data-catalog-category-open]')?.addEventListener('click', openCategoryModal);
   document.querySelectorAll('[data-catalog-category-close]').forEach((button) => button.addEventListener('click', closeCategoryModal));
