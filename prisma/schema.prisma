@@ -104,7 +104,10 @@ model Product {
   description      String?
   specifications   String?
   price            Int?
+  priceTo          Int?
   priceFrom        Boolean  @default(false)
+  seoTitle         String?
+  seoDescription   String?
   isActive         Boolean  @default(true)
   sortOrder        Int      @default(0)
   createdAt        DateTime @default(now())

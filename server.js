@@ -61,6 +61,15 @@ function escapeHtml(value) {
     .replaceAll("'", '&#039;');
 }
 
+function escapeXml(value) {
+  return String(value || '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&apos;');
+}
+
 // админка
 
 app.get('/admin/login', sendAdminPage('login.html'));
@@ -109,8 +118,32 @@ app.get('/robots.txt', (req, res) => {
   return res.sendFile(path.join(__dirname, 'robots.txt'));
 });
 
-app.get('/sitemap.xml', (req, res) => {
-  return res.sendFile(path.join(__dirname, 'sitemap.xml'));
+app.get('/sitemap.xml', async (req, res, next) => {
+  try {
+    const products = await prisma.product.findMany({
+      where: {
+        isActive: true,
+        OR: [
+          { categoryId: null },
+          { category: { is: { isActive: true } } },
+        ],
+      },
+      orderBy: { updatedAt: 'desc' },
+      select: { slug: true, updatedAt: true },
+    });
+    const staticUrls = [
+      ['https://autocat-abakan.ru/', '1.0'],
+      ['https://autocat-abakan.ru/catalog', '0.9'],
+      ['https://autocat-abakan.ru/udalenie-katalizatora.html', '0.9'],
+    ];
+    const entries = [
+      ...staticUrls.map(([loc, priority]) => `<url><loc>${loc}</loc><changefreq>weekly</changefreq><priority>${priority}</priority></url>`),
+      ...products.map((product) => `<url><loc>${escapeXml(`https://autocat-abakan.ru/catalog/${encodeURIComponent(product.slug)}`)}</loc><lastmod>${product.updatedAt.toISOString()}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`),
+    ];
+    return res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${entries.join('')}</urlset>`);
+  } catch (error) {
+    return next(error);
+  }
 });
 
 app.get('/404.html', (req, res) => {
@@ -174,6 +207,14 @@ app.get('/catalog/:slug', async (req, res, next) => {
       select: {
         name: true,
         shortDescription: true,
+        description: true,
+        seoTitle: true,
+        seoDescription: true,
+        brand: true,
+        sku: true,
+        price: true,
+        priceTo: true,
+        images: { orderBy: { sortOrder: 'asc' }, take: 1, select: { path: true } },
       },
     });
 
@@ -185,15 +226,51 @@ app.get('/catalog/:slug', async (req, res, next) => {
       path.join(__dirname, 'site', 'product.html'),
       'utf8',
     );
-    const title = `${product.name} — каталог Автокат Сервис`;
+    const title = product.seoTitle || `${product.name} — купить в Абакане | Автокат Сервис`;
     const description =
-      product.shortDescription ||
+      product.seoDescription || product.shortDescription || product.description?.slice(0, 165) ||
       `${product.name}. Оставьте заявку — менеджер AutoCat уточнит совместимость и подтвердит заказ.`;
     const canonical = `https://autocat-abakan.ru/catalog/${encodeURIComponent(slug)}`;
+    const image = product.images?.[0]?.path
+      ? `https://autocat-abakan.ru${product.images[0].path}`
+      : 'https://autocat-abakan.ru/site/img/og-image.jpg';
+    const structuredData = {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: product.name,
+      description,
+      image: [image],
+      url: canonical,
+      ...(product.brand ? { brand: { '@type': 'Brand', name: product.brand } } : {}),
+      ...(product.sku ? { sku: product.sku } : {}),
+      ...(product.price !== null
+        ? {
+            offers: product.priceTo !== null
+              ? {
+                  '@type': 'AggregateOffer',
+                  priceCurrency: 'RUB',
+                  lowPrice: product.price,
+                  highPrice: product.priceTo,
+                  offerCount: 1,
+                  availability: 'https://schema.org/InStock',
+                  url: canonical,
+                }
+              : {
+                  '@type': 'Offer',
+                  priceCurrency: 'RUB',
+                  price: product.price,
+                  availability: 'https://schema.org/InStock',
+                  url: canonical,
+                },
+          }
+        : {}),
+    };
     const html = template
       .replaceAll('{{PRODUCT_TITLE}}', escapeHtml(title))
       .replaceAll('{{PRODUCT_DESCRIPTION}}', escapeHtml(description))
-      .replaceAll('{{PRODUCT_CANONICAL}}', escapeHtml(canonical));
+      .replaceAll('{{PRODUCT_CANONICAL}}', escapeHtml(canonical))
+      .replaceAll('{{PRODUCT_IMAGE}}', escapeHtml(image))
+      .replaceAll('{{PRODUCT_STRUCTURED_DATA}}', JSON.stringify(structuredData).replaceAll('<', '\\u003c'));
 
     return res.type('html').send(html);
   } catch (error) {
@@ -280,6 +357,7 @@ async function getCurrentCart(rawItems) {
       name: true,
       slug: true,
       price: true,
+      priceTo: true,
       priceFrom: true,
       images: {
         orderBy: {
@@ -308,6 +386,7 @@ async function getCurrentCart(rawItems) {
         slug: product.slug,
         name: product.name,
         price: product.price,
+        priceTo: product.priceTo,
         priceFrom: product.priceFrom,
         image: product.images[0] || null,
         quantity: item.quantity,
@@ -725,6 +804,8 @@ app.post('/api/cart/checkout', sendLimiter, async (req, res) => {
       const price =
         item.price === null
           ? 'цена по запросу'
+          : item.priceTo !== null
+            ? `от ${new Intl.NumberFormat('ru-RU').format(item.price)} ₽ до ${new Intl.NumberFormat('ru-RU').format(item.priceTo)} ₽`
           : `${new Intl.NumberFormat('ru-RU').format(item.price)} ₽`;
 
       return `${index + 1}. ${item.name} — ${item.quantity} шт. (${price})`;

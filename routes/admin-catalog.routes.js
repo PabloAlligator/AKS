@@ -56,7 +56,10 @@ const productDataSchema = z.object({
   description: z.string().trim().max(5000).nullable(),
   specifications: z.string().trim().max(5000).nullable(),
   price: z.number().int().min(0).max(100000000).nullable(),
+  priceTo: z.number().int().min(0).max(100000000).nullable(),
   priceFrom: z.boolean(),
+  seoTitle: z.string().trim().max(70).nullable(),
+  seoDescription: z.string().trim().max(170).nullable(),
   isActive: z.boolean(),
   sortOrder: z.number().int().min(-100000).max(100000),
   removeImageIds: z.array(z.number().int().positive()).max(6),
@@ -98,6 +101,7 @@ function parseRemoveImageIds(value) {
 
 function parseProductBody(body) {
   const priceValue = String(body.price ?? '').trim();
+  const priceToValue = String(body.priceTo ?? '').trim();
   const categoryValue = String(body.categoryId ?? '').trim();
   const sortOrderValue = String(body.sortOrder ?? '0').trim();
 
@@ -111,11 +115,37 @@ function parseProductBody(body) {
     description: emptyToNull(body.description),
     specifications: emptyToNull(body.specifications),
     price: priceValue ? Number(priceValue) : null,
+    priceTo: priceToValue ? Number(priceToValue) : null,
     priceFrom: parseBoolean(body.priceFrom),
+    seoTitle: emptyToNull(body.seoTitle),
+    seoDescription: emptyToNull(body.seoDescription),
     isActive: parseBoolean(body.isActive, true),
     sortOrder: sortOrderValue ? Number(sortOrderValue) : 0,
     removeImageIds: parseRemoveImageIds(body.removeImageIds),
   });
+}
+
+function getProductValidationMessage(result) {
+  const issue = result.error?.issues?.[0];
+  const field = issue?.path?.[0];
+  const labels = { name: 'название товара', slug: 'адрес страницы', categoryId: 'категорию', sku: 'артикул', brand: 'бренд', shortDescription: 'короткое описание', description: 'описание', specifications: 'характеристики', price: 'цену от', priceTo: 'цену до', seoTitle: 'SEO-заголовок', seoDescription: 'SEO-описание', sortOrder: 'порядок сортировки' };
+  return field && labels[field]
+    ? `Проверьте поле «${labels[field]}»: ${issue.message}`
+    : 'Проверьте заполненные данные товара';
+}
+
+function validatePriceRange(data) {
+  if (data.priceTo !== null && data.price === null) return 'Чтобы указать цену «до», сначала заполните цену «от»';
+  if (data.price !== null && data.priceTo !== null && data.priceTo < data.price) return 'Цена «до» не может быть меньше цены «от»';
+  return '';
+}
+
+function sendProductSaveError(res, error) {
+  console.error('Product save error:', error);
+  if (error?.code === 'P2003') return res.status(400).json({ message: 'Выбранная категория больше не существует. Обновите страницу и выберите категорию снова' });
+  if (error?.code === 'P2002') return res.status(409).json({ message: 'Товар с такими уникальными данными уже существует' });
+  if (error?.code === 'P2025') return res.status(404).json({ message: 'Товар больше не существует. Обновите страницу' });
+  return res.status(500).json({ message: 'Не удалось сохранить товар из-за ошибки сервера. Попробуйте ещё раз или проверьте журнал сервера' });
 }
 
 function storedPath(file) {
@@ -462,7 +492,13 @@ router.post(
 
       if (!parsed.success) {
         cleanupUploadedFiles(req.files);
-        return res.status(400).json({ message: 'Проверьте данные товара' });
+        return res.status(400).json({ message: getProductValidationMessage(parsed) });
+      }
+
+      const priceError = validatePriceRange(parsed.data);
+      if (priceError) {
+        cleanupUploadedFiles(req.files);
+        return res.status(400).json({ message: priceError });
       }
 
       const { removeImageIds, slug: requestedSlug, ...data } = parsed.data;
@@ -495,7 +531,7 @@ router.post(
       return res.status(201).json({ product });
     } catch (error) {
       cleanupUploadedFiles(req.files);
-      return next(error);
+      return sendProductSaveError(res, error);
     }
   },
 );
@@ -513,7 +549,13 @@ router.patch(
 
       if (!parsedId.success || !parsed.success) {
         cleanupUploadedFiles(req.files);
-        return res.status(400).json({ message: 'Проверьте данные товара' });
+        return res.status(400).json({ message: parsed.success ? 'Некорректный идентификатор товара' : getProductValidationMessage(parsed) });
+      }
+
+      const priceError = validatePriceRange(parsed.data);
+      if (priceError) {
+        cleanupUploadedFiles(req.files);
+        return res.status(400).json({ message: priceError });
       }
 
       const existing = await prisma.product.findUnique({
@@ -598,7 +640,7 @@ router.patch(
       return res.json({ product });
     } catch (error) {
       cleanupUploadedFiles(req.files);
-      return next(error);
+      return sendProductSaveError(res, error);
     }
   },
 );

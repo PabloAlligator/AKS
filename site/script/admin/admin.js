@@ -2727,10 +2727,13 @@ function openProductModal(product = null) {
   document.querySelector('[data-catalog-product-sku]').value = product?.sku || '';
   document.querySelector('[data-catalog-product-slug]').value = product?.slug || '';
   document.querySelector('[data-catalog-product-price]').value = product?.price ?? '';
+  document.querySelector('[data-catalog-product-price-to]').value = product?.priceTo ?? '';
   document.querySelector('[data-catalog-product-order]').value = product?.sortOrder ?? 0;
   document.querySelector('[data-catalog-product-short]').value = product?.shortDescription || '';
   document.querySelector('[data-catalog-product-description]').value = product?.description || '';
   document.querySelector('[data-catalog-product-specifications]').value = product?.specifications || '';
+  document.querySelector('[data-catalog-product-seo-title]').value = product?.seoTitle || '';
+  document.querySelector('[data-catalog-product-seo-description]').value = product?.seoDescription || '';
   document.querySelector('[data-catalog-product-caption]').textContent = product ? 'Редактирование товара' : 'Новый товар';
   document.querySelector('[data-catalog-product-title]').textContent = product ? product.name : 'Добавить товар';
   document.querySelector('[data-catalog-product-delete]').hidden = !product;
@@ -2757,6 +2760,18 @@ async function saveAdminProduct(event) {
   }
 
   const product = catalogAdminState.activeProduct;
+  const price = form.elements.price.value.trim();
+  const priceTo = form.elements.priceTo.value.trim();
+  if (priceTo && !price) {
+    setProductModalMessage('Чтобы указать цену «до», сначала заполните цену «от»');
+    form.elements.price.focus();
+    return;
+  }
+  if (price && priceTo && Number(priceTo) < Number(price)) {
+    setProductModalMessage('Цена «до» не может быть меньше цены «от»');
+    form.elements.priceTo.focus();
+    return;
+  }
   const submit = document.querySelector('[data-catalog-product-save]');
   setProductModalMessage('');
   submit.disabled = true;

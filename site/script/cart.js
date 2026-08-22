@@ -59,7 +59,11 @@
       const controls = document.createElement('div');
       controls.className = 'cart-item__controls';
       const price = document.createElement('strong');
-      price.textContent = item.price === null ? 'Цена по запросу' : formatMoney(item.price * item.quantity);
+      price.textContent = item.price === null
+        ? 'Цена по запросу'
+        : item.priceTo !== null && item.priceTo !== undefined
+          ? `от ${formatMoney(item.price * item.quantity)} до ${formatMoney(item.priceTo * item.quantity)}`
+          : `${item.priceFrom ? 'от ' : ''}${formatMoney(item.price * item.quantity)}`;
       const counter = document.createElement('div');
       counter.className = 'cart-item__counter';
       const minus = document.createElement('button');

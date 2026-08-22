@@ -383,10 +383,10 @@ select {
   background: $catalog-light-surface;
   box-shadow: 0 12px 30px rgba(20, 21, 24, 0.045);
   flex-direction: column;
-  transition: border-color 180ms ease, transform 180ms ease;
+  transition: box-shadow 180ms ease, transform 180ms ease;
 
   &:hover {
-    border-color: rgba($red, 0.48);
+    box-shadow: 0 16px 38px rgba(20, 21, 24, 0.13);
     transform: translateY(-2px);
   }
 

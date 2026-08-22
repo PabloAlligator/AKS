@@ -27,6 +27,7 @@
       slug: product.slug,
       name: product.name,
       price: product.price === null || product.price === undefined ? null : Number(product.price),
+      priceTo: product.priceTo === null || product.priceTo === undefined ? null : Number(product.priceTo),
       priceFrom: Boolean(product.priceFrom),
       image: getProductImage(product),
       quantity,
@@ -129,6 +130,10 @@
     }
 
     const value = new Intl.NumberFormat('ru-RU').format(product.price);
+    if (product.priceTo !== null && product.priceTo !== undefined) {
+      const maximum = new Intl.NumberFormat('ru-RU').format(product.priceTo);
+      return `от ${value} ₽ до ${maximum} ₽`;
+    }
     return `${product.priceFrom ? 'от ' : ''}${value} ₽`;
   }
 

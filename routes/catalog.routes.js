@@ -147,6 +147,7 @@ router.get('/products', async (req, res, next) => {
           brand: true,
           shortDescription: true,
           price: true,
+          priceTo: true,
           priceFrom: true,
           category: {
             select: {
@@ -244,6 +245,7 @@ router.get('/products/:slug', async (req, res, next) => {
         brand: true,
         shortDescription: true,
         price: true,
+        priceTo: true,
         priceFrom: true,
         category: {
           select: {

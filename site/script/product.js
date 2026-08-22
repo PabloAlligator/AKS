@@ -197,10 +197,10 @@ function renderSpecifications(value) {
 }
 
 function updateMeta(product) {
-  document.title = `${product.name} — каталог Автокат Сервис`;
+  document.title = product.seoTitle || `${product.name} — купить в Абакане | Автокат Сервис`;
   document.querySelector('meta[name="description"]')?.setAttribute(
     'content',
-    product.shortDescription || `${product.name}. Оставьте заявку — менеджер AutoCat подтвердит заказ.`,
+    product.seoDescription || product.shortDescription || `${product.name}. Оставьте заявку — менеджер AutoCat подтвердит заказ.`,
   );
   document.querySelector('link[rel="canonical"]')?.setAttribute(
     'href',

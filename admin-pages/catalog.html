@@ -156,8 +156,12 @@
             <input type="text" name="slug" maxlength="140" placeholder="Создастся автоматически" data-catalog-product-slug />
           </label>
           <label class="admin-catalog-modal__field">
-            <span>Цена, ₽</span>
+            <span>Цена от, ₽</span>
             <input type="number" name="price" min="0" max="100000000" step="1" placeholder="Пусто — цена по запросу" data-catalog-product-price />
+          </label>
+          <label class="admin-catalog-modal__field">
+            <span>Цена до, ₽</span>
+            <input type="number" name="priceTo" min="0" max="100000000" step="1" placeholder="Необязательно" data-catalog-product-price-to />
           </label>
           <label class="admin-catalog-modal__field">
             <span>Порядок</span>
@@ -176,6 +180,16 @@
             <textarea name="specifications" maxlength="5000" placeholder="По одной в строке:&#10;Объём: 4 л&#10;Вязкость: 5W-40" data-catalog-product-specifications></textarea>
           </label>
           <label class="admin-catalog-modal__field admin-catalog-modal__field--wide">
+            <span>SEO-заголовок</span>
+            <input type="text" name="seoTitle" maxlength="70" placeholder="Если пусто — сформируется из названия товара" data-catalog-product-seo-title />
+            <small>Рекомендуемая длина — до 60–70 символов.</small>
+          </label>
+          <label class="admin-catalog-modal__field admin-catalog-modal__field--wide">
+            <span>SEO-описание</span>
+            <textarea name="seoDescription" maxlength="170" placeholder="Кратко опишите товар для поисковой выдачи" data-catalog-product-seo-description></textarea>
+            <small>Если поле пустое, будет использовано короткое описание товара.</small>
+          </label>
+          <label class="admin-catalog-modal__field admin-catalog-modal__field--wide">
             <span>Фотографии</span>
             <input type="file" name="images" accept="image/jpeg,image/png,image/webp" multiple data-catalog-product-images />
             <small>До 6 фотографий, каждая не больше 6 МБ. JPG, PNG или WEBP.</small>
@@ -184,7 +198,7 @@
           <div class="admin-catalog-modal__images admin-catalog-modal__field--wide" data-catalog-product-existing-images hidden></div>
 
           <div class="admin-catalog-modal__toggles admin-catalog-modal__field--wide">
-            <label><input type="checkbox" data-catalog-product-price-from /><span>Показывать «от» перед ценой</span></label>
+            <label><input type="checkbox" data-catalog-product-price-from /><span>Показывать «от», если цена «до» не заполнена</span></label>
             <label><input type="checkbox" checked data-catalog-product-active /><span>Опубликовать товар</span></label>
           </div>
 

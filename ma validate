@@ -1,0 +1,33 @@
+warning: in the working copy of 'admin-pages/catalog.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'prisma/schema.prisma', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'routes/admin-catalog.routes.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'routes/catalog.routes.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'site/css/admin.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'site/css/catalog.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'site/product.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'site/script/admin/admin.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'site/script/cart.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'site/script/catalog-common.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'site/script/product.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'site/styles/admin.scss', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'site/styles/catalog.scss', LF will be replaced by CRLF the next time Git touches it
+ admin-pages/catalog.html       |  18 [32m+[m[31m-[m
+ package-lock.json              |  16 [32m+[m[31m-[m
+ package.json                   |   3 [32m+[m
+ prisma/schema.prisma           |   3 [32m+[m
+ routes/admin-catalog.routes.js |  50 [32m+++++[m[31m-[m
+ routes/catalog.routes.js       |   2 [32m+[m
+ server.js                      |  91 [32m+++++++++[m[31m-[m
+ site/css/admin.css             | 346 [32m++++++++++++++++++++++++++++++[m[31m-----[m
+ site/css/admin.min.css         |   2 [32m+[m[31m-[m
+ site/css/catalog.css           |   4 [32m+[m[31m-[m
+ site/css/catalog.min.css       |   2 [32m+[m[31m-[m
+ site/product.html              |  14 [32m++[m
+ site/script/admin/admin.js     |  15 [32m++[m
+ site/script/cart.js            |   6 [32m+[m[31m-[m
+ site/script/catalog-common.js  |   5 [32m+[m
+ site/script/product.js         |   4 [32m+[m[31m-[m
+ site/styles/admin.scss         | 400 [32m++++++++++++++++++++++++++++++++++[m[31m-------[m
+ site/styles/catalog.scss       |   4 [32m+[m[31m-[m
+ 18 files changed, 850 insertions(+), 135 deletions(-)
